@@ -64,8 +64,8 @@ const fetchAudio = async (url, channelIndex, loadSampleButtonElement) => {
   }
 };
 
-function playSound(channel, currentStep, isMuted) {
-  if (channel.querySelectorAll('.step-button')[currentStep].classList.contains('selected') && !isMuted) {
+function playSound(channel, currentStep) {
+  if (channel.querySelectorAll('.step-button')[currentStep].classList.contains('selected')) {
     const url = channel.dataset.originalUrl;
     const audioBuffer = audioBuffers.get(url);
     if (audioBuffer) {
@@ -81,10 +81,12 @@ function playSound(channel, currentStep, isMuted) {
       // Then connect the gain node to the destination (speakers)
       gainNodes[channelIndex].connect(audioContext.destination);
 
+
       source.start();
     }
   }
 }
+
 
 
 // Function to toggle the play state
