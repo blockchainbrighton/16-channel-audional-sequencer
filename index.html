@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div id="drum-machine">
+        <h1>
+          <span class="button-label">Play</span>
+          <div class="button button-round tooltip">
+            <div class="button play-button" id="play"></div>
+            <span class="tooltiptext">Start the sequence.</span>
+          </div>
+          <span class="title">Audional Sequencer <span class="bright-orange">&#x20bf;</span>itcoin<span class="bright-orange">&#x20bf;</span>eats<span class="small-text">   &#x20bf;eta</span></span>
+          <span class="button-label stop">Stop</span>
+          <div class="button button-round tooltip">
+            <div class="button stop-button" id="stop"></div>
+            <span class="tooltiptext">Stop the sequence.</span>
+          </div>
+          <div class="bpm-container">
+            BPM: <input type="range" min="60" max="180" value="105" step="1" id="bpm-slider">
+            <div class="bpm-display" id="bpm-display">105</div>
+          </div>
+        </h1>
+        <div class="subtext-container">
+          <p class="subtext centered-text">
+            Raw On-chain <span class="bright-orange">&#x20bf;</span>itcoin Audionals: playing live, directly from the <span class="">&#x20bf;</span>lockchain!
+          </p>
+        </div>
+        <main id="app" role="main">
+
+        <div class="channel" id="channel-1">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                           
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="channel" id="channel-2">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                 <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="channel" id="channel-3">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="channel" id="channel-4">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="channel" id="channel-5">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="channel" id="channel-6">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="channel" id="channel-7">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="channel" id="channel-8">
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
+
+            </button>
+            <div>
+                <button class="control-button clear-button tooltip">
+                  C
+                  <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                  M
+                  <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+              </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div class="button-container">
+      <button id="save-button" class="tooltip">Save
+        <span class="tooltiptext">This button will save your sequence into JSON file for download so you can recall it later on.</span>
+      </button>
+      <input type="file" id="save-file-input" style="display: none">
+      <button id="load-button" class="tooltip">Load
+        <span class="tooltiptext">This button will load your audional composition JSON files, even while the sequencer is playing live.</span>
+      </button>
+      <input type="file" id="load-file-input" style="display: none" accept=".json">
+      <button class="new-button">Inscribe Audional Composition</button>
+      <span class="new-button-subtext">(Coming soon...)</span>
+    </div>
+  </div>
+
+  <script src="displayUpdatedValues.js"></script>
+  <script src="eventListeners.js"></script>
+  <script src="masterSettings.js"></script>
+  <script src="channelSettings.js"></script>
+  <script src="stepHandling.js"></script>
+  <script src="stepSchedulers.js"></script>
+  <script src="embeddedPreset.js"></script>
+  <script src="audionalSampleLibrary.js"></script>
+  <script src="audioUtils.js"></script>
+  <script src="importExport.js"></script>
+  <script src="index.js"></script>
+
+</body>
+    </html>
+    

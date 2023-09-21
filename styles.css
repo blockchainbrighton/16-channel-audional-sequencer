@@ -1,0 +1,366 @@
+
+:root {
+--main-bg-color: #000;
+--secondary-bg-color: #333;
+--primary-color: #fff;
+--accent-color: #f00;
+--play-button-dimension: 50px;
+--stop-button-dimension: 50px;
+--control-button-dimension: 20px;
+--box-shadow-style: 0 0 10px var(--main-bg-color) inset;
+--margin-style: 10px;
+--default-font: Arial, sans-serif;
+--step-button-dimension: 20px; /* added */
+--sequence-light-dimension: 20px; /* added */
+}
+
+body {
+background-color: var(--main-bg-color);
+color: var(--primary-color);
+font: normal normal normal 100%/1 var(--default-font);
+}
+
+#drum-machine {
+width: 100%;
+margin: 0 auto;
+padding: 0px;
+background-color: var(--secondary-bg-color);
+border: 5px solid var(--main-bg-color);
+}
+
+h1 {
+text-align: center;
+display: flex;
+justify-content: space-between;
+align-items: center;
+position: relative;
+}
+
+.button {
+border: none;
+background-color: var(--primary-color);
+cursor: pointer;
+box-shadow: var(--box-shadow-style);
+}
+
+h1 .button {
+padding: 10px;
+color: var(--main-bg-color);
+font-size: 1em;
+}
+h3 .subtext {
+font-size: 0.8em; /* Customize the font size for shrinking the subtext */
+opacity: 0.7; /* Customize the opacity for shrinking the subtext */
+}
+
+h3:hover .subtext {
+font-size: 1em; /* Customize the font size for the shrunk subtext on hover */
+opacity: 0.5; /* Customize the opacity for the shrunk subtext on hover */
+}
+
+.step-button {
+margin-top: 0px;
+position: relative;
+width: 15px;
+flex: 1 1 auto; /* added */
+height: 20px;
+background-color: #555;
+color: #fff;
+}
+
+
+
+.control-button {
+width: var(--control-button-dimension);
+height: var(--control-button-dimension);
+}
+.play-button {
+position: relative;
+top: 0px; /* Adjust the value as needed */
+width: var(--play-button-dimension);
+height: var(--play-button-dimension);
+}
+#play.selected {
+background-color: #00ff00;
+}
+.button-label {
+color: #00ff00; /* Green */
+}
+
+
+
+.stop-button {
+position: relative;
+top: 0px; /* Adjust the value as needed */
+width: var(--stop-button-dimension);
+height: var(--stop-button-dimension);
+}
+.button-label.stop {
+color: #ff0000; /* Red */
+}
+
+
+#stop.selected ~ #play {
+background-color: var(--primary-color);
+}
+
+.stop-button:active,
+.stop-button.selected {
+background-color: var(--accent-color);
+}
+
+
+.channel {
+display: flex;
+}
+
+.steps-container {
+flex-wrap: wrap;
+gap: 0px;
+margin: 0px 0;
+}
+
+
+.button-container {
+display: flex;
+align-items: center;
+}
+.title {
+font-size: 40px; /* Adjust the font size as needed */
+}
+
+.small-text {
+font-size: 20px; /* Set the smaller font size for Beta and eta */
+}
+
+#play {
+animation: flash 2s infinite ease-in-out;
+}
+
+#play.selected, 
+#stop.selected ~ #play {
+animation: none; /* Stop the animation when the button is selected */
+}
+
+#stop.selected ~ #play {
+background-color: var(--primary-color);
+}
+
+.step-button:active,
+.step-button.selected
+{
+background-color: var(--accent-color);
+}
+
+.step-button.playing {
+box-shadow: 0 0 10px rgb(150, 150, 150) inset;
+}
+
+.step-button.playing.selected {
+box-shadow: 0 0 10px rgb(150, 1, 1) inset;
+}
+
+
+.clear-button {
+background-color: #ff0;
+}
+
+.mute-button {
+background-color: #800;
+}
+.mute-button.selected {
+background-color: rgb(255, 0, 0);
+}
+
+.load-sample-button {
+flex: 1;
+overflow: auto;
+text-overflow: ellipsis;
+font-size: 0.5em;
+height: 20px;  /* set the height of the buttons */
+padding: 5px;  /* adjust padding as necessary */
+}
+
+.load-sample-button:hover::after {
+position: absolute;
+top: 100%; /* Position it below the load-sample-button */
+left: 0;
+background: var(--primary-color);
+color: var(--main-bg-color);
+z-index: 1;
+}
+
+
+.step-button:nth-child(16n+1) {
+background-color: #ffff00; /* yellow */
+}
+
+.step-button:nth-child(4n+1):not(:nth-child(16n+1)) {
+background-color: #add8e6; /* light blue */
+}
+
+.channel-container .step-button.selected {
+background-color: #ff0000; /* red */
+}
+
+@keyframes flash {
+0% {background-color: var(--primary-color);}
+50% {background-color: #00ff00;}
+100% {background-color: var(--primary-color);}
+}
+
+
+.channel-controls {
+margin-top: 10px; /* Add a top margin if needed */
+}
+.button-label {
+position: center;
+z-index: 2;
+}
+.centered {
+display: block;
+text-align: center;
+}
+.larger-text {
+font-size: 1.5em;
+}
+
+.smaller-text {
+font-size: 1em;
+}
+.bright-orange {
+color: #f7931a;
+}
+.subtext-container {
+display: flex;
+justify-content: flex-end;
+margin-right: 400px;
+}
+
+.centered-text {
+text-align: right;
+}
+.new-button-container {
+position: absolute;
+bottom: 20px;
+right: 20px;
+text-align: right;
+}
+
+.new-button {
+padding: 10px 20px;
+color: black;
+background-color: white;
+border: none;
+border-radius: 5px;
+font-size: 0.75em;
+font-weight: bold;
+box-shadow: var(--box-shadow-style);
+cursor: pointer;
+margin-left: auto;
+
+}
+
+.new-button-subtext {
+display: block;
+font-size: 1em;
+color: var(--primary-color);
+opacity: 0.7;
+}
+.mode-switcher {
+display: flex;
+align-items: center;
+justify-content: center;
+margin-left: 50px;
+}
+
+.mode-switcher label {
+margin-right: 10px;
+}
+
+.mode-switcher input[type="checkbox"] {
+appearance: none;
+width: 40px;
+height: 20px;
+background-color: #ccc;
+border-radius: 10px;
+position: relative;
+outline: none;
+cursor: pointer;
+}
+
+.mode-switcher input[type="checkbox"]:checked {
+background-color: #2196f3;
+}
+
+.mode-switcher input[type="checkbox"]::before {
+content: "";
+position: absolute;
+top: 1px;
+left: 1px;
+width: 18px;
+height: 18px;
+background-color: #fff;
+border-radius: 50%;
+transition: transform 0.2s ease;
+}
+
+.mode-switcher input[type="checkbox"]:checked::before {
+transform: translateX(20px);
+}
+
+#steps-container, #sequence-lights {
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+width: 90%;
+margin-left: 10%; /* Add 20% indentation from the left margin */
+
+}
+.sequence-light, .step-button {
+grid-column: span 1;
+width: var(--step-button-dimension); /* Update to use the same variable as step buttons */
+
+}
+.sequence-light {
+width: var(--step-button-dimension); /* Update to use the same variable as step buttons */
+height: 15px;
+background-color: grey; /* Add your off state styles here */
+box-sizing: border-box;
+}
+
+.sequence-light.on {
+background-color: greenyellow; /* Add your off state styles here */
+/* Add your on state styles here */
+}
+
+.tooltip {
+position: relative;
+display: inline-block;
+cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+visibility: hidden;
+width: 200px; /* Adjust the width as needed */
+background-color: #333; /* Set the background color */
+color: #fff; /* Set the text color */
+text-align: center;
+border-radius: 8px; /* Adjust the border radius as needed */
+padding: 10px;
+position: absolute;
+z-index: 1;
+bottom: -20%; /* Position the tooltip above the text */
+left: 50%;
+transform: translateX(20%); /* Center the tooltip horizontally */
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+visibility: visible;
+opacity: 1;
+}
+
+
+
