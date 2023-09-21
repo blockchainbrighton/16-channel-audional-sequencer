@@ -25,7 +25,9 @@
     let muteState = false
     const sequenceLength = 64;
     const audioBuffers = new Map();
-    let channels = document.querySelectorAll('.channel');
+    let channels = document.querySelectorAll('[id^="channel-"]');
+    let activeChannels = new Set();
+
 
 channels.forEach((channel, index) => {
   channel.dataset.id = `Channel-${index + 1}`;
@@ -178,51 +180,55 @@ channels.forEach((channel, index) => {
 
 
 // The loadPreset function is updated to use updateMuteState function
-  const loadPreset = (preset) => {
-  const presetData = presets[preset];
-
-  if (!presetData) {
-    console.error('Preset not found:', preset);
-    return;
+const loadPreset = (preset) => {
+    const presetData = presets[preset];
+  
+    if (!presetData) {
+      console.error('Preset not found:', preset);
+      return;
+    }
+  
+    channels.forEach((channel, index) => {
+      const channelData = presetData.channels[index];
+      if (!channelData) {
+        console.warn(`No preset data for channel index: ${index}`);
+        return; // Skip this channel since there's no data for it in the preset
+      }
+  
+      const { url, triggers, toggleMuteSteps, mute } = channelData;
+  
+      if (url) { // Only fetch audio if a URL is provided
+        const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
+        fetchAudio(url, index, loadSampleButton);
+      }
+  
+      triggers.forEach(pos => {
+        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+        if (btn) btn.classList.add('selected');
+      });
+  
+      toggleMuteSteps.forEach(pos => {
+        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+        if (btn) btn.classList.add('toggle-mute');
+        console.log(`Channel-${index + 1} loadPreset classList.add`);
+      });
+  
+      const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
+      if (channelElement) {
+        updateMuteState(channelElement, mute); // Correctly pass the 'mute' argument to updateMuteState function
+        console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
+      }
+    });
+  };
+  
+  // Load a preset when the page loads
+  const presetToLoadOnPageLoad = 'preset1';
+  if (presets[presetToLoadOnPageLoad]) {
+    loadPreset(presetToLoadOnPageLoad);
+  } else {
+    console.error('Preset not found:', presetToLoadOnPageLoad);
   }
-
-  presetData.channels.forEach((channelData, index) => {
-    const { url, triggers, toggleMuteSteps, mute } = channelData;
-
-    if (url) { // Only fetch audio if a URL is provided
-      const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
-      fetchAudio(url, index, loadSampleButton);
-    }
-
-    triggers.forEach(pos => {
-      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-      if (btn) btn.classList.add('selected');
-    });
-
-    toggleMuteSteps.forEach(pos => {
-      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-      if (btn) btn.classList.add('toggle-mute');
-      console.log(`Channel-${index + 1} loadPreset classList.add`);
-    });
-
-    const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
-    const muteButton = channelElement.querySelector('.mute-button');
-    if (muteButton) {
-      updateMuteState(channelElement, mute); // Correctly pass the 'mute' argument to updateMuteState function
-      console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
-    }
-  });
-};
-
-// Load a preset when the page loads
-const presetToLoadOnPageLoad = 'preset1';
-if (presets[presetToLoadOnPageLoad]) {
-  loadPreset(presetToLoadOnPageLoad);
-} else {
-  console.error('Preset not found:', presetToLoadOnPageLoad);
-}
-
-
+  
   
     
 
