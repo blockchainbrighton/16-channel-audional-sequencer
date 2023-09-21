@@ -23,8 +23,8 @@ const presets = {
           62,
           63
         ],
-        "mute": true,
-        "toggleMuteSteps": [128, 493, 511],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/0b8eff3f39f4095d0f129bb8dd75f29159f8725c7e66046bf41f70ebb9f60d93i0"
       },
       {
@@ -34,8 +34,8 @@ const presets = {
           33,
           49
         ],
-        "mute": true,
-        "toggleMuteSteps": [384, 493, 511],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/ccf99852fb85d63b5f65124fe506b08c11eb400a7b1da75cd3e0c9538fc49977i0"
       },
       {
@@ -44,7 +44,7 @@ const presets = {
           62
         ],
         "mute": false,
-        "toggleMuteSteps": [493, 511],
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/752bd66406185690c6f14311060785170df91a887b42740e1dde27e5fbf351cbi0"
       },
       {
@@ -55,8 +55,8 @@ const presets = {
           52,
           60
         ],
-        "mute": true,
-        "toggleMuteSteps": [256, 493, 511],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/5b2dc7be28ad70c233b06d0ba23888aa38eb8711c24f8462d2774ac5fb7e7212i0"
       },
       {
@@ -67,7 +67,7 @@ const presets = {
           47
         ],
         "mute": false,
-        "toggleMuteSteps": [493, 511],
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/3364803cb3032ce95f4138a214c15a9b36dcb70f574a477f27615d448e1cdeb8i0"
       },
       {
@@ -78,16 +78,16 @@ const presets = {
           48,
           50
         ],
-        "mute": true,
-        "toggleMuteSteps": [256, 493, 511],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/fb0e5e0b512ad0caf2b0ebed011d2d29aa670ce48f3c147cfc9e633d963f369bi0"
       },
       {
         "triggers": [
           61
         ],
-        "mute": true,
-        "toggleMuteSteps": [379],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/4d73f49620b708e098a59b9c7d5a40bd0c14057d4b803e2f8842d183708ed8a5i0"
       },
       {
@@ -110,8 +110,8 @@ const presets = {
           63,
           64
         ],
-        "mute": true,
-        "toggleMuteSteps": [511],
+        "mute": false,
+        "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/6c01b1214fc4d4016d683380d066849e6bc645276b102604c098bd35fd77f791i0"
       }
             ],

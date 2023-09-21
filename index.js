@@ -19,16 +19,37 @@
     let startTime;
     let nextStepTime;
     let stepDuration;
-    let gainNodes = [];
+    let gainNodes = Array(16).fill(null);
     let isMuted = false;
     let channelMutes = []; // Declare the channelMutes array as a global variable
     let muteState = false
     const sequenceLength = 64;
     const audioBuffers = new Map();
-    let channels = document.querySelectorAll('.channel');
+    let channels = document.querySelectorAll('.channel[id^="channel-"]');
+    let activeChannels = new Set();
+
+    if (!audioContext) {
+        try {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext();
+        } catch (e) {
+            console.warn('Web Audio API is not supported in this browser');
+        }
+    }
+    
 
 channels.forEach((channel, index) => {
   channel.dataset.id = `Channel-${index + 1}`;
+  
+  // Create a gain node for the channel
+  const gainNode = audioContext.createGain();
+  gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
+  gainNode.connect(audioContext.destination);
+  gainNodes[index] = gainNode;
+
+  // Logging to confirm gain node creation and attachment
+  console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
+
 
   const muteButton = channel.querySelector('.mute-button');
   muteButton.addEventListener('click', () => {
@@ -178,51 +199,55 @@ channels.forEach((channel, index) => {
 
 
 // The loadPreset function is updated to use updateMuteState function
-  const loadPreset = (preset) => {
-  const presetData = presets[preset];
-
-  if (!presetData) {
-    console.error('Preset not found:', preset);
-    return;
+const loadPreset = (preset) => {
+    const presetData = presets[preset];
+  
+    if (!presetData) {
+      console.error('Preset not found:', preset);
+      return;
+    }
+  
+    channels.forEach((channel, index) => {
+      const channelData = presetData.channels[index];
+      if (!channelData) {
+        console.warn(`No preset data for channel index: ${index + 1}`);
+        return; // Skip this channel since there's no data for it in the preset
+      }
+  
+      const { url, triggers, toggleMuteSteps, mute } = channelData;
+  
+      if (url) { // Only fetch audio if a URL is provided
+        const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
+        fetchAudio(url, index, loadSampleButton);
+      }
+  
+      triggers.forEach(pos => {
+        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+        if (btn) btn.classList.add('selected');
+      });
+  
+      toggleMuteSteps.forEach(pos => {
+        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+        if (btn) btn.classList.add('toggle-mute');
+        console.log(`Channel-${index + 1} loadPreset classList.add`);
+      });
+  
+      const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
+      if (channelElement) {
+        updateMuteState(channelElement, mute); // Correctly pass the 'mute' argument to updateMuteState function
+        console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
+      }
+    });
+  };
+  
+  // Load a preset when the page loads
+  const presetToLoadOnPageLoad = 'preset1';
+  if (presets[presetToLoadOnPageLoad]) {
+    loadPreset(presetToLoadOnPageLoad);
+  } else {
+    console.error('Preset not found:', presetToLoadOnPageLoad);
   }
-
-  presetData.channels.forEach((channelData, index) => {
-    const { url, triggers, toggleMuteSteps, mute } = channelData;
-
-    if (url) { // Only fetch audio if a URL is provided
-      const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
-      fetchAudio(url, index, loadSampleButton);
-    }
-
-    triggers.forEach(pos => {
-      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-      if (btn) btn.classList.add('selected');
-    });
-
-    toggleMuteSteps.forEach(pos => {
-      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-      if (btn) btn.classList.add('toggle-mute');
-      console.log(`Channel-${index + 1} loadPreset classList.add`);
-    });
-
-    const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
-    const muteButton = channelElement.querySelector('.mute-button');
-    if (muteButton) {
-      updateMuteState(channelElement, mute); // Correctly pass the 'mute' argument to updateMuteState function
-      console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
-    }
-  });
-};
-
-// Load a preset when the page loads
-const presetToLoadOnPageLoad = 'preset1';
-if (presets[presetToLoadOnPageLoad]) {
-  loadPreset(presetToLoadOnPageLoad);
-} else {
-  console.error('Preset not found:', presetToLoadOnPageLoad);
-}
-
-
+  
   
     
 
