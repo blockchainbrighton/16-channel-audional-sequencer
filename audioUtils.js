@@ -1,16 +1,5 @@
 // audioUtils.js
 
-// Function to update the mute state in a single function
-function updateMuteState(channel, shouldMute) {
-  const channelIndex = parseInt(channel.dataset.id.split('-')[1]) - 1;
-  channel.dataset.muted = shouldMute ? 'true' : 'false';
-  const muteButton = channel.querySelector('.mute-button');
-
-  muteButton.classList.toggle('selected', shouldMute);
-  channelMutes[channelIndex] = shouldMute;
-
-  console.log(`Channel-${channel.dataset.id.replace("Channel-", "")} Muted: ${shouldMute}`);
-}
 
 // Function to get the ID from a URL
 function getIDFromURL(url) {
@@ -75,7 +64,6 @@ const fetchAudio = async (url, channelIndex, loadSampleButtonElement) => {
   }
 };
 
-// Function to play a sound
 function playSound(channel, currentStep, isMuted) {
   if (channel.querySelectorAll('.step-button')[currentStep].classList.contains('selected') && !isMuted) {
     const url = channel.dataset.originalUrl;
@@ -83,11 +71,21 @@ function playSound(channel, currentStep, isMuted) {
     if (audioBuffer) {
       const source = audioContext.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
+
+      // Get the channel's index
+      const channelIndex = parseInt(channel.dataset.id.split('-')[1]) - 1;
+
+      // Connect the source to its corresponding gain node
+      source.connect(gainNodes[channelIndex]);
+
+      // Then connect the gain node to the destination (speakers)
+      gainNodes[channelIndex].connect(audioContext.destination);
+
       source.start();
     }
   }
 }
+
 
 // Function to toggle the play state
 function togglePlayState(isPlaying, startStopFunction, firstButton, secondButton) {
@@ -98,6 +96,27 @@ function togglePlayState(isPlaying, startStopFunction, firstButton, secondButton
     secondButton.classList.remove('selected');
   }
 }
+
+// Function to update the mute state in a single function
+function updateMuteState(channel, shouldMute) {
+    const channelIndex = parseInt(channel.dataset.id.split('-')[1]) - 1;
+    channel.dataset.muted = shouldMute ? 'true' : 'false';
+    const muteButton = channel.querySelector('.mute-button');
+  
+    muteButton.classList.toggle('selected', shouldMute);
+    channelMutes[channelIndex] = shouldMute;
+  
+    // Mute or unmute using gain node
+    if (shouldMute) {
+        gainNodes[channelIndex].gain.value = 0; // Mute the channel
+    } else {
+        gainNodes[channelIndex].gain.value = 1; // Unmute the channel (set to original volume)
+    }
+  
+    console.log(`Channel-${channel.dataset.id.replace("Channel-", "")} Muted: ${shouldMute}`);
+}
+
+  
 
 // Function to handle manual toggle of the mute button
 function toggleMute(channelElement) {

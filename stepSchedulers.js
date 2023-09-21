@@ -1,7 +1,6 @@
 // stepSchedulers.js
 
 function startScheduler() {
-    audioContext = new AudioContext();
     startTime = audioContext.currentTime;
     nextStepTime = startTime;
 

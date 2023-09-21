@@ -70,7 +70,8 @@
   </div>
   <script>
     const mainContainer = document.getElementById('app');
-    const channelTemplate = document.querySelector('.channel-template .channel');
+    const channelTemplateContainer = document.querySelector('.channel-template');
+    const channelTemplate = channelTemplateContainer.querySelector('.channel');
       
     for(let i = 1; i <= 16; i++) {
         let clonedChannel = channelTemplate.cloneNode(true);
@@ -80,6 +81,9 @@
         // Logging the channel name and its index
         console.log(`Created Channel Name: ${clonedChannel.id}, Index: ${i}`);
     }
+    
+    // Remove the template container
+    channelTemplateContainer.remove();
 </script>
 
   <script src="displayUpdatedValues.js"></script>

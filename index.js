@@ -19,18 +19,37 @@
     let startTime;
     let nextStepTime;
     let stepDuration;
-    let gainNodes = [];
+    let gainNodes = Array(16).fill(null);
     let isMuted = false;
     let channelMutes = []; // Declare the channelMutes array as a global variable
     let muteState = false
     const sequenceLength = 64;
     const audioBuffers = new Map();
-    let channels = document.querySelectorAll('[id^="channel-"]');
+    let channels = document.querySelectorAll('.channel[id^="channel-"]');
     let activeChannels = new Set();
 
+    if (!audioContext) {
+        try {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext();
+        } catch (e) {
+            console.warn('Web Audio API is not supported in this browser');
+        }
+    }
+    
 
 channels.forEach((channel, index) => {
   channel.dataset.id = `Channel-${index + 1}`;
+  
+  // Create a gain node for the channel
+  const gainNode = audioContext.createGain();
+  gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
+  gainNode.connect(audioContext.destination);
+  gainNodes[index] = gainNode;
+
+  // Logging to confirm gain node creation and attachment
+  console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
+
 
   const muteButton = channel.querySelector('.mute-button');
   muteButton.addEventListener('click', () => {
@@ -191,7 +210,7 @@ const loadPreset = (preset) => {
     channels.forEach((channel, index) => {
       const channelData = presetData.channels[index];
       if (!channelData) {
-        console.warn(`No preset data for channel index: ${index}`);
+        console.warn(`No preset data for channel index: ${index + 1}`);
         return; // Skip this channel since there's no data for it in the preset
       }
   

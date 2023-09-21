@@ -41,7 +41,7 @@ function playStep() {
 
         // If no channelData is found for the current channel, use a default set of values
         if (!channelData) {
-            console.warn(`Using default values for channel index: ${channelIndex}`);
+            console.warn(`No preset data for channel index: ${channelIndex + 1}`);
             channelData = {
                 triggers: [],
                 toggleMuteSteps: [],
