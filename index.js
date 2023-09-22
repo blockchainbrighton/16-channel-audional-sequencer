@@ -1,32 +1,32 @@
-
-    let isPlaying = false;
-    let currentStep = 0;
-    let totalStepCount = 0
-    let beatCount = 1; // individual steps
-    let barCount = 1; // bars
-    let sequenceCount = 1; // sequences
-    let timeoutId;
-    let isPaused = false; // a flag to indicate if the sequencer is paused
-    let pauseTime = 0;  // tracks the total paused time
-    let stopClickCount = 0;
-    let playButton = document.getElementById('play');
-    let stopButton = document.getElementById('stop');
-    let saveButton = document.getElementById('save-button');
-    let loadButton = document.getElementById('load-button');
-    let bpm = 105;
-    let audioContext;
-    let currentStepTime;
-    let startTime;
-    let nextStepTime;
-    let stepDuration;
-    let gainNodes = Array(16).fill(null);
-    let isMuted = false;
-    let channelMutes = []; // Declare the channelMutes array as a global variable
-    let muteState = false
-    const sequenceLength = 64;
-    const audioBuffers = new Map();
-    let channels = document.querySelectorAll('.channel[id^="channel-"]');
-    let activeChannels = new Set();
+let isPlaying = false;
+let currentStep = 0;
+let totalStepCount = 0
+let beatCount = 1; // individual steps
+let barCount = 1; // bars
+let sequenceCount = 1; // sequences
+let timeoutId;
+let isPaused = false; // a flag to indicate if the sequencer is paused
+let pauseTime = 0;  // tracks the total paused time
+let stopClickCount = 0;
+let playButton = document.getElementById('play');
+let stopButton = document.getElementById('stop');
+let saveButton = document.getElementById('save-button');
+let loadButton = document.getElementById('load-button');
+let bpm = 105;
+let audioContext;
+let currentStepTime;
+let startTime;
+let nextStepTime;
+let stepDuration;
+let gainNodes = Array(16).fill(null);
+let isMuted = false;
+let channelMutes = []; // Declare the channelMutes array as a global variable
+let muteState = false
+let soloedChannels = Array(16).fill(false); // Assuming you have 16 channels
+const sequenceLength = 64;
+const audioBuffers = new Map();
+let channels = document.querySelectorAll('.channel[id^="channel-"]');
+let activeChannels = new Set();
 
     if (!audioContext) {
         try {
@@ -38,33 +38,80 @@
     }
     
 
-channels.forEach((channel, index) => {
-  channel.dataset.id = `Channel-${index + 1}`;
-  
-  // Create a gain node for the channel
-  const gainNode = audioContext.createGain();
-  gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
-  gainNode.connect(audioContext.destination);
-  gainNodes[index] = gainNode;
-
-  // Logging to confirm gain node creation and attachment
-  console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
-
-
-  const muteButton = channel.querySelector('.mute-button');
-  muteButton.addEventListener('click', () => {
-    const currentMuteState = channel.dataset.muted === 'true';
-    updateMuteState(channel, !currentMuteState);
-    console.log(`Channel-${index + 1} channels.forEach just toggled updateMuteState`);
-  });
-
-  const clearButton = channel.querySelector('.clear-button');
-  clearButton.addEventListener('click', () => {
-    const stepButtons = channel.querySelectorAll('.step-button');
-    stepButtons.forEach(button => {
-      button.classList.remove('selected');
+    channels.forEach((channel, index) => {
+      channel.dataset.id = `Channel-${index + 1}`;
+      
+      // Create a gain node for the channel
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
+      gainNode.connect(audioContext.destination);
+      gainNodes[index] = gainNode;
+    
+      // Logging to confirm gain node creation and attachment
+      console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
+    
+    
+      const muteButton = channel.querySelector('.mute-button');
+      muteButton.addEventListener('click', () => {
+          const isSoloed = soloedChannels[index];
+          
+          // If the channel is currently soloed, unsolo it before muting
+          if (isSoloed) {
+              soloedChannels[index] = false;
+              soloButton.classList.remove('selected');
+          }
+    
+          // Update mute state after addressing solo state
+          const currentMuteState = channel.dataset.muted === 'true';
+          updateMuteState(channel, !currentMuteState);
+          console.log(`Channel-${index + 1} channels.forEach just toggled updateMuteState`);
+      });
+    
+    
+    
+      
+      const soloButton = channel.querySelector('.solo-button');
+      soloButton.addEventListener('click', () => {
+          const isSoloed = soloedChannels[index];
+          
+          // If the channel is currently soloed, unsolo it
+          if (isSoloed) {
+              soloedChannels[index] = false;
+              soloButton.classList.remove('selected');
+          } else { // If the channel is not soloed, solo it
+              soloedChannels[index] = true;
+              soloButton.classList.add('selected');
+              
+              // Ensure that the mute button of this channel is turned off when it's soloed
+              updateMuteState(channel, false);
+              muteButton.classList.remove('selected');
+          }
+    
+    
+        // Check the number of soloed channels
+        const numberOfSoloedChannels = soloedChannels.filter(state => state).length;
+    
+        // If more than one channel is soloed, only mute channels that aren't soloed
+        if (numberOfSoloedChannels > 0) {
+            channels.forEach((otherChannel, otherIndex) => {
+                if (!soloedChannels[otherIndex]) {
+                    updateMuteState(otherChannel, true); // Mute
+                }
+            });
+        } else { // If no channels are soloed, unmute all channels
+            channels.forEach((otherChannel, otherIndex) => {
+                updateMuteState(otherChannel, false); // Unmute
+            });
+        }
     });
-  });
+    
+    const clearButton = channel.querySelector('.clear-button');
+      clearButton.addEventListener('click', () => {
+        const stepButtons = channel.querySelectorAll('.step-button');
+        stepButtons.forEach(button => {
+          button.classList.remove('selected');
+        });
+      });
 
   const stepsContainer = channel.querySelector('.steps-container');
   stepsContainer.innerHTML = '';
