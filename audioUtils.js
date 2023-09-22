@@ -32,15 +32,6 @@ const fetchAudio = async (url, channelIndex, loadSampleButtonElement) => {
     const data = await response.json();
     const audioData = base64ToArrayBuffer(data.audioData.split(',')[1]);
 
-    if (!audioContext) {
-      try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-      } catch (e) {
-        console.warn('Web Audio API is not supported in this browser');
-      }
-    }
-
     const audioBuffer = await decodeAudioData(audioData);
     audioBuffers.set(url, audioBuffer);
 
