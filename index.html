@@ -31,29 +31,33 @@
       <!-- This is the channel template that will be cloned and populated by JavaScript -->
       <div class="channel-template" style="display: none;">
         <div class="channel">
-          <button class="load-sample-button" title="Load New Audional">Load New Audional
-            <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
-          </button>
-          <div>
-            <button class="control-button clear-button tooltip">
-              C
-              <span class="tooltiptext">Clear the current channel's sequence.</span>
+            <button class="load-sample-button" title="Load New Audional">Load New Audional
+                <span class="tooltiptext">Use this button to load a new audional sample into the current channel.</span>
             </button>
-            <button class="control-button mute-button tooltip">
-              M
-              <span class="tooltiptext">Mute or unmute the current channel.</span>
-            </button>
-          </div>
-          <div class="channel-container">
-            <div class="steps-container"></div>
-            <div class="controls-container">
-              <div class="channel-controls">
-                <div class="button-container"></div>
-              </div>
+            <div>
+                <button class="control-button clear-button tooltip">
+                    C
+                    <span class="tooltiptext">Clear the current channel's sequence.</span>
+                </button>
+                <button class="control-button mute-button tooltip">
+                    M
+                    <span class="tooltiptext">Mute or unmute the current channel.</span>
+                </button>
+                <button class="control-button solo-button tooltip">
+                    S
+                    <span class="tooltiptext">Solo the current channel.</span>
+                </button>
             </div>
-          </div>
+            <div class="channel-container">
+                <div class="steps-container"></div>
+                <div class="controls-container">
+                    <div class="channel-controls">
+                        <div class="button-container"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>    
     </main>
     <div class="button-container">
       <button id="save-button" class="tooltip">Save

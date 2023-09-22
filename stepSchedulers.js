@@ -33,9 +33,8 @@ function scheduleNextStep() {
 }
 
 function stopScheduler() {
-    if (audioContext) {
-        audioContext.close();
-    }
+ 
+    
     clearTimeout(timeoutId);
 
     // Reset counters
