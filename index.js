@@ -22,11 +22,14 @@ let gainNodes = Array(16).fill(null);
 let isMuted = false;
 let channelMutes = []; // Declare the channelMutes array as a global variable
 let muteState = false
+let volumeStates = Array(16).fill(1); // Start with full volume for all channels
 let soloedChannels = Array(16).fill(false); // Assuming you have 16 channels
 const sequenceLength = 64;
 const audioBuffers = new Map();
 let channels = document.querySelectorAll('.channel[id^="channel-"]');
 let activeChannels = new Set();
+let clearClickedOnce = Array(channels.length).fill(false);
+let clearConfirmTimeout = Array(channels.length).fill(null);
 
     if (!audioContext) {
         try {
@@ -35,6 +38,17 @@ let activeChannels = new Set();
         } catch (e) {
             console.warn('Web Audio API is not supported in this browser');
         }
+    }
+
+    // Function to update the actual volume
+    function updateVolume(channel, index) {
+      if (soloedChannels.some(state => state)) {
+          // If any channel is soloed, reduce volume to 0 for non-soloed channels
+          gainNodes[index].gain.value = soloedChannels[index] ? 1 : 0;
+      } else {
+          // Otherwise, use the volume state
+          gainNodes[index].gain.value = volumeStates[index];
+      }
     }
     
 
@@ -73,45 +87,69 @@ let activeChannels = new Set();
       const soloButton = channel.querySelector('.solo-button');
       soloButton.addEventListener('click', () => {
           const isSoloed = soloedChannels[index];
-          
-          // If the channel is currently soloed, unsolo it
-          if (isSoloed) {
-              soloedChannels[index] = false;
-              soloButton.classList.remove('selected');
-          } else { // If the channel is not soloed, solo it
-              soloedChannels[index] = true;
-              soloButton.classList.add('selected');
-              
-              // Ensure that the mute button of this channel is turned off when it's soloed
-              updateMuteState(channel, false);
-              muteButton.classList.remove('selected');
+
+          // Toggle solo state for the current channel
+          soloedChannels[index] = !isSoloed;
+          soloButton.classList.toggle('selected', !isSoloed);
+
+          // Reset all channels to unmuted state
+          channels.forEach((otherChannel, otherIndex) => {
+              updateMuteState(otherChannel, false);
+          });
+
+          // If there are any channels in solo mode, mute all channels that are not soloed
+          if (soloedChannels.some(state => state)) {
+              channels.forEach((otherChannel, otherIndex) => {
+                  if (!soloedChannels[otherIndex]) {
+                      updateMuteState(otherChannel, true);
+                  }
+              });
           }
-    
-    
-        // Check the number of soloed channels
-        const numberOfSoloedChannels = soloedChannels.filter(state => state).length;
-    
-        // If more than one channel is soloed, only mute channels that aren't soloed
-        if (numberOfSoloedChannels > 0) {
-            channels.forEach((otherChannel, otherIndex) => {
-                if (!soloedChannels[otherIndex]) {
-                    updateMuteState(otherChannel, true); // Mute
-                }
-            });
-        } else { // If no channels are soloed, unmute all channels
-            channels.forEach((otherChannel, otherIndex) => {
-                updateMuteState(otherChannel, false); // Unmute
-            });
-        }
-    });
+      });
+
     
     const clearButton = channel.querySelector('.clear-button');
-      clearButton.addEventListener('click', () => {
-        const stepButtons = channel.querySelectorAll('.step-button');
-        stepButtons.forEach(button => {
-          button.classList.remove('selected');
-        });
-      });
+    const clearConfirm = channel.querySelector('.clear-confirm');
+
+    clearButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent the click from being captured by the document click listener
+
+        if (!clearClickedOnce[index]) {
+            // Show the visual indication
+            clearConfirm.style.display = "block";
+            clearClickedOnce[index] = true;
+
+            // Set a timer to hide the confirmation after 2 seconds
+            clearConfirmTimeout[index] = setTimeout(() => {
+                clearConfirm.style.display = "none";
+                clearClickedOnce[index] = false;  // Reset the variable for the specific channel when the timer ends
+            }, 2000);
+        } else {
+            // Clear the steps
+            const stepButtons = channel.querySelectorAll('.step-button');
+            stepButtons.forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            // Hide the visual indication
+            clearConfirm.style.display = "none";
+            clearTimeout(clearConfirmTimeout[index]); // Clear the timer for the specific channel
+            clearClickedOnce[index] = false;  // Reset the variable for the specific channel after clearing steps
+        }
+    });
+
+    // Handle clicks outside the clear button
+    document.addEventListener('click', () => {
+        if (clearClickedOnce[index]) {
+            clearConfirm.style.display = "none";
+            clearTimeout(clearConfirmTimeout[index]); // Clear the timer for the specific channel
+            clearClickedOnce[index] = false;  // Reset the variable for the specific channel when clicked outside
+        }
+    });
+
+
+
+
 
   const stepsContainer = channel.querySelector('.steps-container');
   stepsContainer.innerHTML = '';
@@ -155,27 +193,134 @@ let activeChannels = new Set();
                     idModalContent.style.overflowY = 'auto';
 
                     const instructionText = document.createElement('p');
-                    instructionText.textContent = 'Enter the ordinal ID for the Audional you want to load:';
+                    instructionText.textContent = 'Enter an Ordinal ID to load a Bitcoin Audional:';
+                    instructionText.style.color = 'black';  // Setting the color to black
                     idModalContent.appendChild(instructionText);
 
-                    // Add input field
+                    // Add input field for Ordinal ID
                     const audionalInput = document.createElement('input');
                     audionalInput.type = 'text';
-                    audionalInput.placeholder = 'Enter ID or choose below:';
+                    audionalInput.placeholder = 'Enter ORD ID:';
                     audionalInput.style.marginBottom = '10px';
+                    audionalInput.style.width = '100%';
+                    audionalInput.style.boxSizing = 'border-box';
                     idModalContent.appendChild(audionalInput);
+
+                    const ipfsInstructionText = document.createElement('p');
+                    ipfsInstructionText.textContent = 'Or, enter an IPFS ID for an off-chain Audional:';
+                    ipfsInstructionText.style.color = 'black';  // Setting the color to black
+                    idModalContent.appendChild(ipfsInstructionText);
+
+                    // Add input field for IPFS address
+                    const ipfsInput = document.createElement('input');
+                    ipfsInput.type = 'text';
+                    ipfsInput.placeholder = 'Enter IPFS ID:';
+                    ipfsInput.style.marginBottom = '10px';
+                    ipfsInput.style.width = '100%';
+                    ipfsInput.style.boxSizing = 'border-box';
+                    idModalContent.appendChild(ipfsInput);
+
+                    // Event listeners to disable one input when the other is being used
+                    audionalInput.addEventListener('input', () => {
+                      console.log("Ordinal ID entered:", audionalInput.value);
+                        if (audionalInput.value) {
+                            ipfsInput.disabled = true;
+                        } else {
+                            ipfsInput.disabled = false;
+                        }
+                    });
+
+                    ipfsInput.addEventListener('input', () => {
+                        if (ipfsInput.value) {
+                          console.log("IPFS CID entered:", ipfsInput.value);
+                            audionalInput.disabled = true;
+                        } else {
+                            audionalInput.disabled = false;
+                        }
+                    });
 
                     const loadButton = document.createElement('button');
                     loadButton.textContent = 'Load';
                     loadButton.addEventListener('click', () => {
+                      if (audionalInput.value) {
                         const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalInput.value);
                         fetchAudio(audionalUrl, index, loadSampleButton);
+                        
+                        // Add the orange margin to the channel container
+                        const channelContainer = channel.querySelector('.channel-container');
+                        channelContainer.classList.add('ordinal-loaded');
+                        } else if (ipfsInput.value) {
+                        // Handle IPFS address logic here
+                        const ipfsUrl = 'https://ipfs.io/ipfs/' + ipfsInput.value;
+                        fetchAudio(ipfsUrl, index, loadSampleButton);
+
+                        // Remove the orange margin from the channel container
+                        const channelContainer = channel.querySelector('.channel-container');
+                        channelContainer.classList.remove('ordinal-loaded');
+}
                         document.body.removeChild(idModal);
                     });
                     idModalContent.appendChild(loadButton);
 
+                    // Cancel button implementation
+                    const cancelButton = document.createElement('button');
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.addEventListener('click', () => {
+                        document.body.removeChild(idModal);
+                    });
+                    idModalContent.appendChild(cancelButton);
+
+                    // Create an audio element for previewing the audionals
+                    const audioPreview = new Audio();
+
+                    // Function to play a preview
+                    const playPreview = (url) => {
+                      audioPreview.src = url;
+                      audioPreview.play();
+                    };
+
                     audionalIDs.forEach((audionalObj) => {
-                        const idLink = document.createElement('a');
+                      const idLinkContainer = document.createElement('div');
+                      idLinkContainer.style.display = 'flex';
+                      idLinkContainer.style.alignItems = 'center';
+                      idLinkContainer.style.marginBottom = '10px';
+                  
+                      // Create an audition play button for previewing
+                      const auditionPlayButton = document.createElement('button');
+                      auditionPlayButton.textContent = '▶️';
+                      auditionPlayButton.style.marginRight = '10px';
+                  
+                      idLinkContainer.appendChild(auditionPlayButton);
+                  
+                      auditionPlayButton.addEventListener('click', async (e) => {
+                          e.preventDefault();
+                          
+                          // Construct the audionalUrl using the same logic as idLink's click event
+                          const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalObj.id);
+                          
+                          // Use the sequencer's function to buffer and play the audio
+                          playAuditionedSample(audionalUrl);
+                      });
+                  
+                      const idLink = document.createElement('a');
+                      idLink.href = '#';
+                      idLink.textContent = audionalObj.label;
+                      idLink.addEventListener('click', (e) => {
+                          e.preventDefault();
+                          const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalObj.id);
+                          fetchAudio(audionalUrl, index, loadSampleButton);
+                          document.body.removeChild(idModal);
+                      });
+                      idLinkContainer.appendChild(idLink);
+                  
+                      idModalContent.appendChild(idLinkContainer);
+         
+
+                    
+                  
+           
+            
+
                         idLink.href = '#';
                         idLink.textContent = audionalObj.label;
                         idLink.style.display = 'block';
@@ -247,54 +392,57 @@ let activeChannels = new Set();
 
 // The loadPreset function is updated to use updateMuteState function
 const loadPreset = (preset) => {
-    const presetData = presets[preset];
-  
-    if (!presetData) {
-      console.error('Preset not found:', preset);
-      return;
-    }
-  
-    channels.forEach((channel, index) => {
-      const channelData = presetData.channels[index];
-      if (!channelData) {
-        console.warn(`No preset data for channel index: ${index + 1}`);
-        return; // Skip this channel since there's no data for it in the preset
-      }
-  
-      const { url, triggers, toggleMuteSteps, mute } = channelData;
-  
-      if (url) { // Only fetch audio if a URL is provided
-        const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
-        fetchAudio(url, index, loadSampleButton);
-      }
-  
-      triggers.forEach(pos => {
-        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-        if (btn) btn.classList.add('selected');
-      });
-  
-      toggleMuteSteps.forEach(pos => {
-        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-        if (btn) btn.classList.add('toggle-mute');
-        console.log(`Channel-${index + 1} loadPreset classList.add`);
-      });
-  
-      const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
-      if (channelElement) {
-        updateMuteState(channelElement, mute); // Correctly pass the 'mute' argument to updateMuteState function
-        console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
-      }
-    });
-  };
-  
-  // Load a preset when the page loads
-  const presetToLoadOnPageLoad = 'preset1';
-  if (presets[presetToLoadOnPageLoad]) {
-    loadPreset(presetToLoadOnPageLoad);
-  } else {
-    console.error('Preset not found:', presetToLoadOnPageLoad);
+  const presetData = presets[preset];
+
+  if (!presetData) {
+    console.error('Preset not found:', preset);
+    return;
   }
-  
+
+  channels.forEach((channel, index) => {
+    const channelData = presetData.channels[index];
+    if (!channelData) {
+      console.warn(`No preset data for channel index: ${index + 1}`);
+      return; // Skip this channel since there's no data for it in the preset
+    }
+
+    const { url, triggers, toggleMuteSteps, mute } = channelData;
+
+    if (url) { // Only fetch audio if a URL is provided
+      const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .load-sample-button`);
+      fetchAudio(url, index, loadSampleButton);
+    }
+
+    triggers.forEach(pos => {
+      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+      if (btn) btn.classList.add('selected');
+    });
+
+    toggleMuteSteps.forEach(pos => {
+      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
+      if (btn) btn.classList.add('toggle-mute');
+      console.log(`Channel-${index + 1} loadPreset classList.add`);
+    });
+
+    const channelElement = document.querySelector(`.channel[data-id="Channel-${index + 1}"]`);
+    if (channelElement) {
+      updateMuteState(channelElement, mute); 
+      console.log(`Channel-${index + 1} updateMuteState toggled by the loadPreset function - Muted: ${mute}`);
+      
+      // Add the 'ordinal-loaded' class to the channel element
+      channelElement.classList.add('ordinal-loaded');
+    }
+  });
+};
+
+// Load a preset when the page loads
+const presetToLoadOnPageLoad = 'preset1';
+if (presets[presetToLoadOnPageLoad]) {
+  loadPreset(presetToLoadOnPageLoad);
+} else {
+  console.error('Preset not found:', presetToLoadOnPageLoad);
+}
+
   
     
 

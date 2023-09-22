@@ -26,7 +26,7 @@ const decodeAudioData = (audioData) => {
 };
 
 // Function to fetch audio data
-const fetchAudio = async (url, channelIndex, loadSampleButtonElement) => {
+const fetchAudio = async (url, channelIndex, loadSampleButtonElement = null) => {
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -86,6 +86,33 @@ function playSound(channel, currentStep) {
     }
   }
 }
+
+async function playAuditionedSample(url) {
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const audioData = base64ToArrayBuffer(data.audioData.split(',')[1]);
+
+      if (!audioContext) {
+          try {
+              window.AudioContext = window.AudioContext || window.webkitAudioContext;
+              audioContext = new AudioContext();
+          } catch (e) {
+              console.warn('Web Audio API is not supported in this browser');
+          }
+      }
+
+      const audioBuffer = await decodeAudioData(audioData);
+
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContext.destination);
+      source.start();
+  } catch (error) {
+      console.error('Error playing auditioned sample:', error);
+  }
+}
+
 
 
 
