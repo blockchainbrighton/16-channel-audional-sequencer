@@ -189,6 +189,7 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
                     idModalContent.style.backgroundColor = 'white';
                     idModalContent.style.padding = '20px';
                     idModalContent.style.borderRadius = '10px';
+                    idModalContent.style.width = '80%';
                     idModalContent.style.maxHeight = '500px';  // Adjust this value as per your needs
                     idModalContent.style.overflowY = 'auto';
 
@@ -284,24 +285,23 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
                       idLinkContainer.style.display = 'flex';
                       idLinkContainer.style.alignItems = 'center';
                       idLinkContainer.style.marginBottom = '10px';
-                  
+                      idLinkContainer.style.flexDirection = 'row';
+                    
                       // Create an audition play button for previewing
                       const auditionPlayButton = document.createElement('button');
                       auditionPlayButton.textContent = '▶️';
                       auditionPlayButton.style.marginRight = '10px';
-                  
-                      idLinkContainer.appendChild(auditionPlayButton);
-                  
+                    
                       auditionPlayButton.addEventListener('click', async (e) => {
                           e.preventDefault();
-                          
                           // Construct the audionalUrl using the same logic as idLink's click event
                           const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalObj.id);
-                          
                           // Use the sequencer's function to buffer and play the audio
                           playAuditionedSample(audionalUrl);
                       });
                   
+                      idLinkContainer.appendChild(auditionPlayButton);
+                    
                       const idLink = document.createElement('a');
                       idLink.href = '#';
                       idLink.textContent = audionalObj.label;
@@ -311,9 +311,10 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
                           fetchAudio(audionalUrl, index, loadSampleButton);
                           document.body.removeChild(idModal);
                       });
-                      idLinkContainer.appendChild(idLink);
                   
+                      idLinkContainer.appendChild(idLink);
                       idModalContent.appendChild(idLinkContainer);
+              
          
 
                     
@@ -369,6 +370,7 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
           });
 
           stopButton.addEventListener('click', () => {
+            
               if (isPlaying) {
                   stopScheduler();
                   stopButton.classList.add('selected');

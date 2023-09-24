@@ -159,6 +159,7 @@ div[idModalContent] div button:hover {
 /* Sample name styling */
 div[idModalContent] div a {
     text-decoration: none;
+    display: flex;
     color: black;
     transition: color 0.3s ease;
 }

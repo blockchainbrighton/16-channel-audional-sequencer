@@ -1,6 +1,11 @@
 // stepSchedulers.js
 
 function startScheduler() {
+    channels.forEach(channel => {
+        setChannelVolume(parseInt(channel.dataset.id.split('-')[1]) - 1, 1); 
+      });
+    clearTimeout(timeoutId); // Clear the current timeout without closing the audio context
+    audioContext.resume();
     startTime = audioContext.currentTime;
     nextStepTime = startTime;
 
@@ -9,6 +14,7 @@ function startScheduler() {
 
 function pauseScheduler() {
     clearTimeout(timeoutId); // Clear the current timeout without closing the audio context
+    audioContext.suspend();
     pauseTime = audioContext.currentTime;  // record the time at which the sequencer was paused
     isPaused = true;
 }
@@ -16,6 +22,7 @@ function pauseScheduler() {
 function resumeScheduler() {
   if(isPaused) {
       // Replace the startTime adjustment with a nextStepTime reset
+      audioContext.resume();
       nextStepTime = audioContext.currentTime;
       isPaused = false;
   }
@@ -32,11 +39,12 @@ function scheduleNextStep() {
     }, (nextStepTime - audioContext.currentTime) * 1000);
 }
 
-function stopScheduler() {
- 
-    
-    clearTimeout(timeoutId);
 
+function stopScheduler() {
+    channels.forEach(channel => {
+        setChannelVolume(parseInt(channel.dataset.id.split('-')[1]) - 1, 0);
+      });
+    clearTimeout(timeoutId);
     // Reset counters
     currentStep = 0;
     beatCount = 1;
