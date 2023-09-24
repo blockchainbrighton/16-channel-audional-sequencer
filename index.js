@@ -3,7 +3,10 @@ let currentStep = 0;
 let totalStepCount = 0
 let beatCount = 1; // individual steps
 let barCount = 1; // bars
-let sequenceCount = 1; // sequences
+let sequenceCount = 1;
+const sequenceLength = 64;
+let maxSequenceCount = 64; // sequences
+const allSequencesLength = 4096;
 let timeoutId;
 let isPaused = false; // a flag to indicate if the sequencer is paused
 let pauseTime = 0;  // tracks the total paused time
@@ -24,7 +27,6 @@ let channelMutes = []; // Declare the channelMutes array as a global variable
 let muteState = false
 let volumeStates = Array(16).fill(1); // Start with full volume for all channels
 let soloedChannels = Array(16).fill(false); // Assuming you have 16 channels
-const sequenceLength = 64;
 const audioBuffers = new Map();
 let channels = document.querySelectorAll('.channel[id^="channel-"]');
 let activeChannels = new Set();
@@ -151,24 +153,33 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
 
 
 
-  const stepsContainer = channel.querySelector('.steps-container');
-  stepsContainer.innerHTML = '';
+    const stepsContainer = channel.querySelector('.steps-container');
+    stepsContainer.innerHTML = '';
 
-  // Check if the current channel is 'channel-1'
-  let isChannelOne = channel.id === 'channel-1';
+    // Check if the current channel is 'channel-1'
+    let isChannelOne = channel.id === 'channel-1';
 
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < 64; i++) {
-    const button = document.createElement('button');
-    button.classList.add('step-button');
-    button.addEventListener('click', () => {
-      button.classList.toggle('selected');
-    });
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < 64; i++) {
+      const button = document.createElement('button');
+      button.classList.add('step-button');
+      
+      // Retrieve the channel index from the channel's id attribute
+      let channelIndex = parseInt(channel.id.split('-')[1]) - 1; // Convert 'channel-x' format to an index (0-15)
+      
+      button.addEventListener('click', () => {
+        button.classList.toggle('selected');
+        
+        // Update the step's state in the channelSettings
+        let stepState = button.classList.contains('selected');
+        updateStep(channelIndex, i, stepState);
+      });
 
-    fragment.appendChild(button);
-  }
+      fragment.appendChild(button);
+    }
 
-  stepsContainer.appendChild(fragment);
+    stepsContainer.appendChild(fragment);
+
 
             const loadSampleButton = channel.querySelector('.load-sample-button');
                 loadSampleButton.addEventListener('click', () => {
@@ -391,7 +402,6 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
         }
 
 
-
 // The loadPreset function is updated to use updateMuteState function
 const loadPreset = (preset) => {
   const presetData = presets[preset];
@@ -435,17 +445,18 @@ const loadPreset = (preset) => {
       channelElement.classList.add('ordinal-loaded');
     }
   });
+  console.log(preset);
+  // Load settings into the internal array
+  loadChannelSettingsFromPreset(presets[preset]);
 };
 
 // Load a preset when the page loads
 const presetToLoadOnPageLoad = 'preset1';
 if (presets[presetToLoadOnPageLoad]) {
-  loadPreset(presetToLoadOnPageLoad);
+    loadPreset(presetToLoadOnPageLoad);
+    loadSequence(sequenceCount);  // Ensure the current sequence is loaded
 } else {
-  console.error('Preset not found:', presetToLoadOnPageLoad);
+    console.error('Preset not found:', presetToLoadOnPageLoad);
 }
-
-  
-    
 
 
