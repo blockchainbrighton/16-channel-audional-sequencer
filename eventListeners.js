@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function() {
       // Trigger a click on the download link
       downloadLink.click();
     });
+    
+  
   
     loadButton.addEventListener('click', () => {
       // Trigger a click on the load file input

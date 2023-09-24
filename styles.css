@@ -1,17 +1,39 @@
 /* --- Variables (Theme) --- */
 :root {
+    --scale-factor: 1vw;
     --main-bg-color: #000;
     --secondary-bg-color: #333;
     --primary-color: #fff;
     --accent-color: #f00;
-    --play-button-dimension: 50px;
-    --stop-button-dimension: 50px;
-    --control-button-dimension: 20px;
+    --button-dimension: 50px;
+    --control-button-dimension: 18px;
+    --step-button-max-width: 18px;
+    --step-button-max-height: calc(18px * var(--scale-factor));    
     --box-shadow-style: 0 0 10px var(--main-bg-color) inset;
-    --margin-style: 10px;
     --default-font: Arial, sans-serif;
-    --step-button-dimension: 20px;
-    --sequence-light-dimension: 20px;
+}
+@media (max-width: 1200px) {
+    #main-container {
+        transform: scale(0.9);
+    }
+}
+
+@media (max-width: 1000px) {
+    #main-container {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 800px) {
+    #main-container {
+        transform: scale(0.7);
+    }
+}
+
+@media (max-width: 600px) {
+    #main-container {
+        transform: scale(0.6);
+    }
 }
 
 /* --- Global Styles --- */
@@ -23,11 +45,12 @@ body {
 
 /* --- Drum Machine Container --- */
 #drum-machine {
-    width: 100%;
+    width: 95%; /* Updated width to ensure 95% of the page */
     margin: 0 auto;
     padding: 0;
     background-color: var(--secondary-bg-color);
     border: 5px solid var(--main-bg-color);
+    box-sizing: border-box; /* Include padding and border in the total width */
 }
 
 /* --- Headers & Text Elements --- */
@@ -49,85 +72,6 @@ h3:hover .subtext {
     opacity: 0.5;
 }
 
-/* --- Buttons & Controls --- */
-.button {
-    border: none;
-    background-color: var(--primary-color);
-    cursor: pointer;
-    box-shadow: var(--box-shadow-style);
-}
-
-h1 .button {
-    padding: 10px;
-    color: var(--main-bg-color);
-    font-size: 1em;
-}
-
-.control-button {
-    width: var(--control-button-dimension);
-    height: var(--control-button-dimension);
-}
-
-.play-button, .stop-button {
-    position: relative;
-    top: 0px; /* Consider removing if not necessary */
-}
-
-.play-button {
-    width: var(--play-button-dimension);
-    height: var(--play-button-dimension);
-}
-
-#play.selected {
-    background-color: #00ff00;
-}
-
-.stop-button {
-    width: var(--stop-button-dimension);
-    height: var(--stop-button-dimension);
-}
-
-.button-label.stop {
-    color: #ff0000; /* Red */
-}
-
-#stop.selected ~ #play, .stop-button:active, .stop-button.selected {
-    background-color: var(--accent-color);
-}
-
-/* --- Channel Elements --- */
-.channel {
-    display: flex;
-}
-
-.step-button {
-    margin-top: 0px;
-    position: relative;
-    width: 15px;
-    flex: 1 1 auto;
-    height: var(--step-button-dimension);
-    background-color: #555;
-    color: #fff;
-}
-
-
-/* --- Containers & Layout --- */
-.steps-container {
-    flex-wrap: wrap;
-    gap: 0px;
-    margin: 0px 0;
-}
-
-.button-container, .subtext-container {
-    display: flex;
-    align-items: center;
-}
-
-.channel-controls {
-    margin-top: 10px;
-}
-
-/* --- Text Elements & Typography --- */
 .title {
     font-size: 40px;
 }
@@ -140,13 +84,137 @@ h1 .button {
     font-size: 1.5em;
 }
 
+.centered, .centered-text {
+    display: block;
+    text-align: center;
+}
+
 .bright-orange {
     color: #f7931a;
 }
 
-.centered, .centered-text {
-    display: block;
-    text-align: center;
+/* --- Buttons & Controls --- */
+.button, h1 .button {
+    border: none;
+    background-color: var(--primary-color);
+    cursor: pointer;
+    box-shadow: var(--box-shadow-style);
+    padding: 10px;
+    color: var(--main-bg-color);
+    font-size: 1em;
+}
+
+.control-button {
+    width: var(--control-button-dimension);
+    height: var(--control-button-dimension);
+}
+
+.play-button, .stop-button {
+    position: relative;
+    width: var(--button-dimension);
+    height: var(--button-dimension);
+}
+
+#play.selected {
+    background-color: #00ff00;
+}
+
+.stop-button {
+    background-color: var(--accent-color);
+}
+
+.button-label.stop {
+    color: #ff0000; /* Red */
+}
+
+/* Container for each sample's play button and name */
+div[idModalContent] div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+/* Play button next to each sample name */
+div[idModalContent] div button {
+    margin-right: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for play button */
+div[idModalContent] div button:hover {
+    background-color: #ddd;
+}
+
+/* Sample name styling */
+div[idModalContent] div a {
+    text-decoration: none;
+    display: flex;
+    color: black;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect for sample name */
+div[idModalContent] div a:hover {
+    color: #666;
+}
+
+/* --- Channel Elements --- */
+.channel {
+    width: 92vw; /* You can adjust this value as needed */
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ordinal-loaded {
+    border: 2px solid #f7931a; /* or whatever shade of orange you prefer */
+}
+
+/* Media query for screens smaller than 600px */
+@media (max-width: 600px) {
+    .channel {
+        width: 100%; /* Full width on small screens */
+    }
+}
+
+
+
+
+
+/* --- Containers & Layout --- */
+.steps-container {
+    flex-wrap: wrap;
+    gap: 0px;
+}
+
+.button-container, .subtext-container {
+    display: flex;
+    align-items: center;
+}
+.step-button {
+    position: relative;
+    width: var(--step-button-max-width);  /* Set the width */
+    height: var(--step-button-max-width);  /* Set the height equal to the width */
+    background-color: #555;
+    color: #fff;
+    max-width: var(--step-button-max-width);
+    max-height: var(--step-button-max-height);
+}
+
+
+.channel-controls {
+    margin-top: 0px;
 }
 
 /* --- Button Specific Styles --- */
@@ -159,7 +227,7 @@ h1 .button {
     animation: none;
 }
 
-#stop.selected ~ #play, .step-button.selected, .mute-button.selected {
+#stop.selected ~ #play, .step-button.selected, .mute-button.selected, .solo-button.selected {
     background-color: var(--accent-color);
 }
 
@@ -185,6 +253,7 @@ h1 .button {
     text-overflow: ellipsis;
     font-size: 0.5em;
     height: 20px;
+    min-width: 100px;
     padding: 5px;
 }
 
@@ -220,7 +289,8 @@ h1 .button {
     100% { background-color: var(--primary-color); }
 }
 
-/* --- Button and Container Styles --- */
+
+/* --- LOWER Button and Container Styles --- */
 .new-button-container {
     position: absolute;
     bottom: 20px;
@@ -291,7 +361,7 @@ h1 .button {
 }
 
 /* --- Steps and Sequence Light Styles --- */
-#steps-container, #sequence-lights {
+#sequence-lights {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -299,9 +369,9 @@ h1 .button {
     margin-left: 10%;
 }
 
-.sequence-light, .step-button {
+.sequence-light {
     grid-column: span 1;
-    width: var(--step-button-dimension);
+  
 }
 
 .sequence-light {
