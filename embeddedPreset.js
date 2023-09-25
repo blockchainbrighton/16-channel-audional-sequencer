@@ -100,6 +100,7 @@ const presets = {
         "url": ""
     }
 ],
-"bpm": "105"
+"bpm": 105,
+"name": "Sequence_0"
 }
 };

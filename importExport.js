@@ -7,7 +7,7 @@ const EMPTY_CHANNEL = {
     "url": ""
 };
 
-let sequenceBPMs = Array(totalSequenceCount).fill(0);  // Initialize with 0 BPM for all sequences
+let sequenceBPMs = Array(totalSequenceCount).fill(105);  // Initialize with 0 BPM for all sequences
 
 
 function exportSettings() {
