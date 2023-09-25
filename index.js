@@ -3,7 +3,10 @@ let currentStep = 0;
 let totalStepCount = 0
 let beatCount = 1; // individual steps
 let barCount = 1; // bars
-let sequenceCount = 1; // sequences
+let sequenceCount = 1;
+const sequenceLength = 64;
+let maxSequenceCount = 64; // sequences
+const allSequencesLength = 4096;
 let timeoutId;
 let isPaused = false; // a flag to indicate if the sequencer is paused
 let pauseTime = 0;  // tracks the total paused time
@@ -24,12 +27,20 @@ let channelMutes = []; // Declare the channelMutes array as a global variable
 let muteState = false
 let volumeStates = Array(16).fill(1); // Start with full volume for all channels
 let soloedChannels = Array(16).fill(false); // Assuming you have 16 channels
-const sequenceLength = 64;
 const audioBuffers = new Map();
 let channels = document.querySelectorAll('.channel[id^="channel-"]');
 let activeChannels = new Set();
 let clearClickedOnce = Array(channels.length).fill(false);
 let clearConfirmTimeout = Array(channels.length).fill(null);
+
+let isContinuousPlay = false;
+
+const continuousPlayButton = document.getElementById('continuous-play');
+continuousPlayButton.addEventListener('click', () => {
+    isContinuousPlay = !isContinuousPlay;  // Toggle the continuous play mode
+    continuousPlayButton.classList.toggle('selected', isContinuousPlay);
+});
+
 
     if (!audioContext) {
         try {
@@ -151,24 +162,33 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
 
 
 
-  const stepsContainer = channel.querySelector('.steps-container');
-  stepsContainer.innerHTML = '';
+    const stepsContainer = channel.querySelector('.steps-container');
+    stepsContainer.innerHTML = '';
 
-  // Check if the current channel is 'channel-1'
-  let isChannelOne = channel.id === 'channel-1';
+    // Check if the current channel is 'channel-1'
+    let isChannelOne = channel.id === 'channel-1';
 
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < 64; i++) {
-    const button = document.createElement('button');
-    button.classList.add('step-button');
-    button.addEventListener('click', () => {
-      button.classList.toggle('selected');
-    });
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < 64; i++) {
+      const button = document.createElement('button');
+      button.classList.add('step-button');
+      
+      // Retrieve the channel index from the channel's id attribute
+      let channelIndex = parseInt(channel.id.split('-')[1]) - 1; // Convert 'channel-x' format to an index (0-15)
+      
+      button.addEventListener('click', () => {
+        button.classList.toggle('selected');
+        
+        // Update the step's state in the channelSettings
+        let stepState = button.classList.contains('selected');
+        updateStep(channelIndex, i, stepState);
+      });
 
-    fragment.appendChild(button);
-  }
+      fragment.appendChild(button);
+    }
 
-  stepsContainer.appendChild(fragment);
+    stepsContainer.appendChild(fragment);
+
 
             const loadSampleButton = channel.querySelector('.load-sample-button');
                 loadSampleButton.addEventListener('click', () => {
@@ -353,21 +373,69 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
 
           let isPaused = false;  // Add this line to declare the isPaused flag
 
-          playButton.addEventListener('click', () => {
-            if (!isPlaying) {
-              startScheduler();
-              playButton.classList.add('selected');
-              stopButton.classList.remove('selected');
-              isPlaying = true;
-              isPaused = false;  // Ensure that the isPaused flag is set to false when starting playback
-            } else if (!isPaused) {  // If the sequencer is playing and is not paused, pause the sequencer
-              pauseScheduler();
-              isPaused = true;
-            } else {  // If the sequencer is paused, resume the sequencer
-              resumeScheduler();
-              isPaused = false;
+          function checkContinuousPlay() {
+            const continuousPlayCheckbox = document.getElementById('continuous-play');
+            let isContinuousPlay = continuousPlayCheckbox.checked;
+        
+            if (isContinuousPlay && totalStepCount >= allSequencesLength) {
+                // Reset counters for the next sequence
+                beatCount = 0;
+                barCount = 0;
+                currentStep = 0;
+                totalStepCount = 0;
+        
+                // Simulate a click on the "Next Sequence" button
+                document.getElementById('next-sequence').click();
             }
-          });
+        }
+        
+        
+        
+        function updateSequenceDisplay(sequenceNum) {
+            const sequenceDisplay = document.getElementById('current-sequence-display');
+            if (sequenceDisplay) {
+                sequenceDisplay.textContent = `Sequence ${sequenceNum}`;
+            }
+        }
+        
+        // Inside your playButton event listener, after the play logic
+        playButton.addEventListener('click', () => {            const continuousPlayCheckbox = document.getElementById('continuous-play');
+            let isContinuousPlay = continuousPlayCheckbox.checked;
+
+            if (!isPlaying) {
+                startScheduler();
+                playButton.classList.add('selected');
+                stopButton.classList.remove('selected');
+                isPlaying = true;
+                isPaused = false;  // Ensure that the isPaused flag is set to false when starting playback
+            } else if (!isPaused) {  // If the sequencer is playing and is not paused, pause the sequencer
+                pauseScheduler();
+                isPaused = true;
+            } else {  // If the sequencer is paused, resume the sequencer
+                resumeScheduler();
+                isPaused = false;
+            }
+        
+            if (isContinuousPlay && totalStepCount >= allSequencesLength) {
+                // Reset counters for the next sequence
+                beatCount = 0;
+                barCount = 0;
+                sequenceCount = 0;
+                currentStep = 0;
+                totalStepCount = 0;
+        
+                // Load the next sequence here (assuming you have a function or method to do so)
+                // For example, you can increment the sequenceCount and use it to load the next preset.
+                sequenceCount++;
+                if (sequenceCount > maxSequenceCount) {  // Assuming maxSequenceCount is the total number of sequences you have
+                    sequenceCount = 1;  // Reset to the first sequence if we're at the end
+                }
+                loadPreset(`preset${sequenceCount}`);  // Load the next sequence
+            }
+            // After the sequencer starts, checks for continuous play
+            checkContinuousPlay();
+        });
+        
 
           stopButton.addEventListener('click', () => {
             
@@ -389,7 +457,6 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
         } else {
           console.error("Play or Stop button is not defined");
         }
-
 
 
 // The loadPreset function is updated to use updateMuteState function
@@ -435,17 +502,18 @@ const loadPreset = (preset) => {
       channelElement.classList.add('ordinal-loaded');
     }
   });
+  console.log(preset);
+  // Load settings into the internal array
+  loadChannelSettingsFromPreset(presets[preset]);
 };
 
 // Load a preset when the page loads
 const presetToLoadOnPageLoad = 'preset1';
 if (presets[presetToLoadOnPageLoad]) {
-  loadPreset(presetToLoadOnPageLoad);
+    loadPreset(presetToLoadOnPageLoad);
+    loadSequence(sequenceCount);  // Ensure the current sequence is loaded
 } else {
-  console.error('Preset not found:', presetToLoadOnPageLoad);
+    console.error('Preset not found:', presetToLoadOnPageLoad);
 }
-
-  
-    
 
 
