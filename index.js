@@ -33,6 +33,15 @@ let activeChannels = new Set();
 let clearClickedOnce = Array(channels.length).fill(false);
 let clearConfirmTimeout = Array(channels.length).fill(null);
 
+let isContinuousPlay = false;
+
+const continuousPlayButton = document.getElementById('continuous-play');
+continuousPlayButton.addEventListener('click', () => {
+    isContinuousPlay = !isContinuousPlay;  // Toggle the continuous play mode
+    continuousPlayButton.classList.toggle('selected', isContinuousPlay);
+});
+
+
     if (!audioContext) {
         try {
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -364,21 +373,69 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
 
           let isPaused = false;  // Add this line to declare the isPaused flag
 
-          playButton.addEventListener('click', () => {
-            if (!isPlaying) {
-              startScheduler();
-              playButton.classList.add('selected');
-              stopButton.classList.remove('selected');
-              isPlaying = true;
-              isPaused = false;  // Ensure that the isPaused flag is set to false when starting playback
-            } else if (!isPaused) {  // If the sequencer is playing and is not paused, pause the sequencer
-              pauseScheduler();
-              isPaused = true;
-            } else {  // If the sequencer is paused, resume the sequencer
-              resumeScheduler();
-              isPaused = false;
+          function checkContinuousPlay() {
+            const continuousPlayCheckbox = document.getElementById('continuous-play');
+            let isContinuousPlay = continuousPlayCheckbox.checked;
+        
+            if (isContinuousPlay && totalStepCount >= allSequencesLength) {
+                // Reset counters for the next sequence
+                beatCount = 0;
+                barCount = 0;
+                currentStep = 0;
+                totalStepCount = 0;
+        
+                // Simulate a click on the "Next Sequence" button
+                document.getElementById('next-sequence').click();
             }
-          });
+        }
+        
+        
+        
+        function updateSequenceDisplay(sequenceNum) {
+            const sequenceDisplay = document.getElementById('current-sequence-display');
+            if (sequenceDisplay) {
+                sequenceDisplay.textContent = `Sequence ${sequenceNum}`;
+            }
+        }
+        
+        // Inside your playButton event listener, after the play logic
+        playButton.addEventListener('click', () => {            const continuousPlayCheckbox = document.getElementById('continuous-play');
+            let isContinuousPlay = continuousPlayCheckbox.checked;
+
+            if (!isPlaying) {
+                startScheduler();
+                playButton.classList.add('selected');
+                stopButton.classList.remove('selected');
+                isPlaying = true;
+                isPaused = false;  // Ensure that the isPaused flag is set to false when starting playback
+            } else if (!isPaused) {  // If the sequencer is playing and is not paused, pause the sequencer
+                pauseScheduler();
+                isPaused = true;
+            } else {  // If the sequencer is paused, resume the sequencer
+                resumeScheduler();
+                isPaused = false;
+            }
+        
+            if (isContinuousPlay && totalStepCount >= allSequencesLength) {
+                // Reset counters for the next sequence
+                beatCount = 0;
+                barCount = 0;
+                sequenceCount = 0;
+                currentStep = 0;
+                totalStepCount = 0;
+        
+                // Load the next sequence here (assuming you have a function or method to do so)
+                // For example, you can increment the sequenceCount and use it to load the next preset.
+                sequenceCount++;
+                if (sequenceCount > maxSequenceCount) {  // Assuming maxSequenceCount is the total number of sequences you have
+                    sequenceCount = 1;  // Reset to the first sequence if we're at the end
+                }
+                loadPreset(`preset${sequenceCount}`);  // Load the next sequence
+            }
+            // After the sequencer starts, checks for continuous play
+            checkContinuousPlay();
+        });
+        
 
           stopButton.addEventListener('click', () => {
             
