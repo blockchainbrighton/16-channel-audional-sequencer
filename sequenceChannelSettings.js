@@ -1,5 +1,8 @@
 // sequenceChannelSettings.js
 
+let currentSequence = 1;
+
+
 // Create an initial state for all 16 channels, with 64 steps each set to 'off' (false) plus a placeholder at the 0th index
 var channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
 
@@ -87,6 +90,25 @@ function loadSequence(sequenceNumber) {
     updateUIForSequence(sequenceNumber);
 }
 
+function loadNextSequence() {
+    if (currentSequence < maxSequenceCount) {
+        // Save current sequence's settings
+        saveCurrentSequence(currentSequence);
+
+        // Increment the current sequence number
+        currentSequence++;
+
+        // Load the next sequence's settings
+        loadSequence(currentSequence);
+
+        // Update the display
+        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+    } else {
+        console.warn("You've reached the last sequence.");
+    }
+}
+
+
 function updateUIForSequence(sequenceNumber) {
     const sequenceSettings = sequences[sequenceNumber - 1];
     channels.forEach((channel, index) => {
@@ -111,16 +133,39 @@ function updateUIForSequence(sequenceNumber) {
     });
 }
 
-document.getElementById('prev-sequence').addEventListener('click', () => {
-    if (sequenceCount > 1) {
-        saveCurrentSequence(sequenceCount);  // Save the current sequence
-        sequenceCount--;
-        loadSequence(sequenceCount);
+document.getElementById('prev-sequence').addEventListener('click', function() {
+    if (currentSequence > 1) {
+        // Save current sequence's settings
+        saveCurrentSequence(currentSequence);
+
+        // Decrement the current sequence number
+        currentSequence--;
+
+        // Load the previous sequence's settings
+        loadSequence(currentSequence);
+        
+        // Update the display
+        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+    } else {
+        console.warn("You're already on the first sequence.");
     }
 });
 
-document.getElementById('next-sequence').addEventListener('click', () => {
-    saveCurrentSequence(sequenceCount);  // Save the current sequence
-    sequenceCount++;
-    loadSequence(sequenceCount);
+document.getElementById('next-sequence').addEventListener('click', function() {
+    if (currentSequence < maxSequenceCount) {
+        // Save current sequence's settings
+        saveCurrentSequence(currentSequence);
+
+        // Increment the current sequence number
+        currentSequence++;
+
+        // Load the next sequence's settings
+        loadSequence(currentSequence);
+
+        // Update the display
+        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+    } else {
+        console.warn("You're already on the last sequence.");
+    }
 });
+

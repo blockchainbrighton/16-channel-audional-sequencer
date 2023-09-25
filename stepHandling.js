@@ -69,6 +69,19 @@ function playStep() {
 
     if (currentStep % 64 === 0) {
         sequenceCount++;
+
+        // Check if we need to switch to the next sequence (continuous play logic)
+        const continuousPlayCheckbox = document.getElementById('continuous-play');
+        if (continuousPlayCheckbox && continuousPlayCheckbox.checked) {
+            // Reset counters for the next sequence
+            beatCount = 0;
+            barCount = 0;
+            currentStep = 0;
+            totalStepCount = 0;
+
+            // Use the next-sequence button logic to move to the next sequence
+            document.getElementById('next-sequence').click();
+        }
     }
 
     nextStepTime += stepDuration;
