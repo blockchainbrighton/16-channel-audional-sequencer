@@ -1,7 +1,7 @@
 // sequenceChannelSettings.js
 
 let currentSequence = 1;
-
+let totalSequenceCount = 64;
 
 // Create an initial state for all 16 channels, with 64 steps each set to 'off' (false) plus a placeholder at the 0th index
 var channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
@@ -27,7 +27,7 @@ function loadChannelSettingsFromPreset(preset) {
     });
 
     // Save the loaded preset to the current sequence
-    saveCurrentSequence(sequenceCount);
+    saveCurrentSequence(currentSequence);
 }
 
 
@@ -88,10 +88,14 @@ function loadSequence(sequenceNumber) {
 
     // Update the UI to reflect the loaded sequence
     updateUIForSequence(sequenceNumber);
+
+    // Update the currentSequence
+    currentSequence = sequenceNumber;
 }
 
+
 function loadNextSequence() {
-    if (currentSequence < maxSequenceCount) {
+    if (currentSequence < totalSequenceCount) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
@@ -138,11 +142,8 @@ document.getElementById('prev-sequence').addEventListener('click', function() {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Decrement the current sequence number
-        currentSequence--;
-
         // Load the previous sequence's settings
-        loadSequence(currentSequence);
+        loadSequence(currentSequence - 1);
         
         // Update the display
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
@@ -152,15 +153,12 @@ document.getElementById('prev-sequence').addEventListener('click', function() {
 });
 
 document.getElementById('next-sequence').addEventListener('click', function() {
-    if (currentSequence < maxSequenceCount) {
+    if (currentSequence < totalSequenceCount) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Increment the current sequence number
-        currentSequence++;
-
         // Load the next sequence's settings
-        loadSequence(currentSequence);
+        loadSequence(currentSequence + 1);
 
         // Update the display
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;

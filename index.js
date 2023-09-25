@@ -5,7 +5,7 @@ let beatCount = 1; // individual steps
 let barCount = 1; // bars
 let sequenceCount = 1;
 const sequenceLength = 64;
-let maxSequenceCount = 64; // sequences
+const maxSequenceCount = 64; // sequences
 const allSequencesLength = 4096;
 let timeoutId;
 let isPaused = false; // a flag to indicate if the sequencer is paused
