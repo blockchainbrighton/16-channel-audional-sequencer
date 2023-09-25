@@ -24,20 +24,20 @@ document.addEventListener("DOMContentLoaded", function() {
   
   
     loadButton.addEventListener('click', () => {
-      // Trigger a click on the load file input
+      console.log("Load sequence button clicked");
       loadFileInput.click();
-    });
+  });
   
-    loadFileInput.addEventListener('change', () => {
+  loadFileInput.addEventListener('change', () => {
       let file = loadFileInput.files[0];
       let reader = new FileReader();
       reader.onload = function(e) {
-        let settings = e.target.result;
-        importSettings(settings);
+          let settings = e.target.result;
+          importSettings(settings);
       };
       reader.readAsText(file);
-    });
   });
+});
 
   // Listen for messages
   window.addEventListener('message', function(event) {
