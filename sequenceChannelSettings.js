@@ -114,6 +114,12 @@ function loadNextSequence() {
 
 
 function updateUIForSequence(sequenceNumber) {
+    if (sequenceNumber > 0 && sequenceNumber <= sequences.length) {
+        channelSettings = sequences[sequenceNumber - 1];
+        // Rest of the function remains unchanged...
+    } else {
+        console.error("Invalid sequence number:", sequenceNumber);
+    }
     const sequenceSettings = sequences[sequenceNumber - 1];
     channels.forEach((channel, index) => {
         const stepButtons = channel.querySelectorAll('.step-button');

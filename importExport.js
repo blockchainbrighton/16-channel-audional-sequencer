@@ -42,34 +42,48 @@ function exportSettings() {
 function importSettings(json) {
     let importedData = JSON.parse(json);
 
-    if (!Array.isArray(importedData)) {
+    // If the imported data is a single sequence and there are existing sequences
+    if (!Array.isArray(importedData) && sequences.length > 0) {
         if (importedData.channels) {
-            importedData = [importedData];
+            sequences.push(convertSequenceSettings(importedData)); // Add the new sequence to the existing sequences
+            channelSettings = sequences[currentSequence - 1]; // Update channelSettings to point to the new sequence
         } else {
             console.error("Imported JSON doesn't match expected format.");
             return;
         }
-    }
-
-    sequences = [];
-
-    importedData.forEach((settings) => {
-        let channels = settings.channels;
-        if (channels.length < 16) {
-            let emptyChannelsToAdd = 16 - channels.length;
-            for (let i = 0; i < emptyChannelsToAdd; i++) {
-                channels.push(EMPTY_CHANNEL);
+    } else {
+        // This block handles the existing logic for importing
+        if (!Array.isArray(importedData)) {
+            if (importedData.channels) {
+                importedData = [importedData];
+            } else {
+                console.error("Imported JSON doesn't match expected format.");
+                return;
             }
         }
 
-        let sequenceChannelSettings = channels.map(ch => convertChannelToStepSettings(ch));
-        sequences.push(sequenceChannelSettings);
-    });
+        sequences = [];
+        importedData.forEach((settings) => {
+            sequences.push(convertSequenceSettings(settings));
+        });
+    }
 
-    currentSequence = 1;
-    channelSettings = sequences[currentSequence - 1];
+    currentSequence = sequences.length; // Set the last sequence as the current sequence
     updateUIForSequence(currentSequence);
 }
+
+function convertSequenceSettings(settings) {
+    let channels = settings.channels;
+    if (channels.length < 16) {
+        let emptyChannelsToAdd = 16 - channels.length;
+        for (let i = 0; i < emptyChannelsToAdd; i++) {
+            channels.push(EMPTY_CHANNEL);
+        }
+    }
+
+    return channels.map(ch => convertChannelToStepSettings(ch));
+}
+
 
 function convertChannelToStepSettings(channel) {
     let stepSettings = [null].concat(Array(64).fill(false)); // Placeholder for 0th index
