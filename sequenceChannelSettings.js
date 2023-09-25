@@ -7,7 +7,6 @@ let channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(fa
 
 // Create an initial state for all 16 channels, with 64 steps each set to 'off' (false)
 let sequences = Array(totalSequenceCount).fill().map(() => Array(16).fill().map(() => [null].concat(Array(64).fill(false))));
-let sequenceBPMs = Array(totalSequenceCount).fill(0);  // Initialize with 0 BPM for all sequences
 
 // Create a function to update the channelSettings based on the currentSequence
 function updateChannelSettingsForSequence() {
@@ -144,6 +143,15 @@ function loadSequence(sequenceNumber) {
         // If the sequence doesn't exist, initialize it with default settings
         sequences[sequenceNumber - 1] = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
     }
+
+    // Set the BPM slider and display to match the current sequence's BPM
+    let bpm = sequenceBPMs[sequenceNumber - 1];  // Get the BPM for the current sequence
+    let bpmSlider = document.getElementById('bpm-slider');
+    let bpmDisplay = document.getElementById('bpm-display');
+    bpmSlider.value = bpm;
+    bpmDisplay.innerText = bpm;
+    bpmSlider.dispatchEvent(new Event('input')); // Update the sequencer's BPM
+
     
     const sequenceChannels = sequences[sequenceNumber - 1];
     if (!sequenceChannels) {
@@ -261,4 +269,3 @@ document.getElementById('next-sequence').addEventListener('click', function() {
         console.warn("You're already on the last sequence.");
     }
 });
-
