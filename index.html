@@ -4,6 +4,7 @@
 <head>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
 </head>
 
 <body>
@@ -67,39 +68,61 @@
                 </div>
             </main>
             <div class="button-container">
-                <button id="save-button" class="tooltip">Save
-                    <span class="tooltiptext">This button will save your sequence into JSON file for download so you can recall it later on.</span>
-                </button>
-                <input type="file" id="save-file-input" style="display: none">
-                <button id="load-button" class="tooltip">Load
-                    <span class="tooltiptext">This button will load your audional composition JSON files, even while the sequencer is playing live.</span>
-                </button>
-                <input type="file" id="load-file-input" style="display: none" accept=".json">
-                <button class="new-button">Inscribe Audional Composition</button>
-                <span class="new-button-subtext">(Coming soon...)</span>
-            </div>
-        </div>
-    </div>
+                
+         
+   <!-- Wrap "Save" and "Load" buttons with their associated elements in a container -->
+<div class="button-container">
     <button id="prev-sequence">Previous Sequence</button>
     <span id="current-sequence-display">Sequence 1</span>
     <button id="next-sequence">Next Sequence</button>
     <label for="continuous-play">Continuous Play</label>
     <input type="checkbox" id="continuous-play">
+    <label id="quick-play-button"></label> <!-- Note: I removed the erroneous </button> tag -->
+  
+    <button id="save-button" class="tooltip">Save
+      <span class="tooltiptext">This button will save your sequence into JSON file for download so you can recall it later on.</span>
+    </button>
+    <input type="file" id="save-file-input" style="display: none">
+    <button id="load-button" class="tooltip">Load
+      <span class="tooltiptext">This button will load your audional composition JSON files, even while the sequencer is playing live.</span>
+    </button>
+    <input type="file" id="load-file-input" style="display: none" accept=".json">
+  </div>
+  
+</div>
+</div>
+</div>
     
-    
-    <script>
-        const mainContainer = document.getElementById('app');
-        const channelTemplateContainer = document.querySelector('.channel-template');
-        const channelTemplate = channelTemplateContainer.querySelector('.channel');
+<script>
+   const mainContainer = document.getElementById('app');
+const channelTemplateContainer = document.querySelector('.channel-template');
+const channelTemplate = channelTemplateContainer.querySelector('.channel');
+const quickPlayButtons = [];
 
-        for (let i = 1; i <= 16; i++) {
-            let clonedChannel = channelTemplate.cloneNode(true);
-            clonedChannel.id = `channel-${i}`;
-            mainContainer.appendChild(clonedChannel);
-            console.log(`Created Channel Name: ${clonedChannel.id}, Index: ${i}`);
-        }
-        channelTemplateContainer.remove();
-    </script>
+// Function to create the quick-play-button
+function createQuickPlayButton(index) {
+    const btn = document.createElement('div');
+    btn.classList.add('quick-play-button');
+    btn.dataset.sequenceIndex = index; // Store the sequence index as a data attribute
+    quickPlayButtons.push(btn); // Add the button to the array
+    return btn;
+}
+
+
+
+for (let i = 1; i <= 16; i++) {
+    let clonedChannel = channelTemplate.cloneNode(true);
+    clonedChannel.id = `channel-${i}`;
+
+    mainContainer.appendChild(clonedChannel);
+    console.log(`Created Channel Name: ${clonedChannel.id}, Index: ${i}`);
+}
+
+channelTemplateContainer.remove();
+
+
+
+</script>
 
     <script src="sequenceChannelSettings.js"></script>
 

@@ -202,6 +202,10 @@ function loadNextSequence() {
         // Load the next sequence's settings
         loadSequence(currentSequence);
 
+        // After loading the sequence, update the displayed number and highlight the button:
+        document.getElementById('current-sequence-display').textContent = `Sequence ${sequenceNumber}`;
+        highlightActiveButton(sequenceNumber);
+
         // Update the display
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
     } else {
@@ -209,6 +213,18 @@ function loadNextSequence() {
     }
 }
 
+function highlightActiveButton(sequenceNumber) {
+    // Reset all quickplay buttons first:
+    quickPlayButtons.forEach(button => {
+        button.style.backgroundColor = "green";
+    });
+
+    // Highlight the active one:
+    const activeButton = quickPlayButtons.find(button => parseInt(button.dataset.sequenceIndex, 10) === sequenceNumber);
+    if (activeButton) {
+        activeButton.style.backgroundColor = "lime";  // Choose a bright color to highlight the active button
+    }
+}
 
 function updateUIForSequence(sequenceNumber) {
     if (sequenceNumber > 0 && sequenceNumber <= sequences.length) {
@@ -240,7 +256,45 @@ function updateUIForSequence(sequenceNumber) {
     });
 }
 
+
+function insertQuickPlayButtons() {
+    console.log("insertQuickPlayButtons called!");
+
+    const checkBox = document.getElementById('continuous-play');
+    const quickPlayButton = document.getElementById('quick-play-button');
+
+    if (checkBox && quickPlayButton) {
+        for (let j = 0; j < 16; j++) {
+            const quickBtn = createQuickPlayButton(j + 1);
+            console.log(`Created Quick Play Button for Sequence_${j+1}`);
+            checkBox.parentNode.insertBefore(quickBtn, quickPlayButton);
+            console.log(`Added Quick Play Button for Sequence_${j+1} to DOM`);
+        }
+    } else {
+        console.error("Either checkBox or quickPlayButton is missing!");
+    }
+}
+
+insertQuickPlayButtons();
+
+// Now that the quickplay buttons have been inserted, we can set up their event listeners.
+quickPlayButtons.forEach((button) => {
+    console.log(`Attaching listener to Quick Play Button for Sequence_${button.dataset.sequenceIndex}`);
+    button.addEventListener('click', () => {
+        const sequenceIndex = parseInt(button.dataset.sequenceIndex, 10);
+        currentSequence = sequenceIndex;
+        loadSequence(sequenceIndex);
+        
+        // Update the display for quickplay buttons
+        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        
+        console.log(`Clicked Quick Play Button for Sequence_${sequenceIndex}`);
+    });
+});
+
+
 document.getElementById('prev-sequence').addEventListener('click', function() {
+    console.log("Prev-sequence clicked!"); // Logging the click
     if (currentSequence > 1) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
@@ -256,6 +310,7 @@ document.getElementById('prev-sequence').addEventListener('click', function() {
 });
 
 document.getElementById('next-sequence').addEventListener('click', function() {
+    console.log("Next-sequence clicked!"); // Logging the click
     if (currentSequence < totalSequenceCount) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
