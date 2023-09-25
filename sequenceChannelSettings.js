@@ -202,28 +202,23 @@ function loadNextSequence() {
         // Load the next sequence's settings
         loadSequence(currentSequence);
 
-        // After loading the sequence, update the displayed number and highlight the button:
-        document.getElementById('current-sequence-display').textContent = `Sequence ${sequenceNumber}`;
-        highlightActiveButton(sequenceNumber);
-
-        // Update the display
+        // Update the displayed number
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You've reached the last sequence.");
     }
 }
 
-function highlightActiveButton(sequenceNumber) {
-    // Reset all quickplay buttons first:
-    quickPlayButtons.forEach(button => {
-        button.style.backgroundColor = "green";
+function updateActiveQuickPlayButton() {
+    // Remove 'active' class from all buttons
+    quickPlayButtons.forEach(btn => {
+        btn.classList.remove('active');
     });
 
-    // Highlight the active one:
-    const activeButton = quickPlayButtons.find(button => parseInt(button.dataset.sequenceIndex, 10) === sequenceNumber);
-    if (activeButton) {
-        activeButton.style.backgroundColor = "lime";  // Choose a bright color to highlight the active button
-    }
+    // Add 'active' class to current sequence button
+    const activeBtn = quickPlayButtons[currentSequence - 1];
+    activeBtn.classList.add('active');
 }
 
 function updateUIForSequence(sequenceNumber) {
@@ -279,47 +274,47 @@ insertQuickPlayButtons();
 
 // Now that the quickplay buttons have been inserted, we can set up their event listeners.
 quickPlayButtons.forEach((button) => {
-    console.log(`Attaching listener to Quick Play Button for Sequence_${button.dataset.sequenceIndex}`);
     button.addEventListener('click', () => {
         const sequenceIndex = parseInt(button.dataset.sequenceIndex, 10);
         currentSequence = sequenceIndex;
         loadSequence(sequenceIndex);
-        
-        // Update the display for quickplay buttons
+
+        // Update the display and highlight the active button
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
-        
-        console.log(`Clicked Quick Play Button for Sequence_${sequenceIndex}`);
+        updateActiveQuickPlayButton();
     });
 });
 
 
 document.getElementById('prev-sequence').addEventListener('click', function() {
-    console.log("Prev-sequence clicked!"); // Logging the click
     if (currentSequence > 1) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Load the previous sequence's settings
-        loadSequence(currentSequence - 1);
+        // Decrement the current sequence number and load its settings
+        currentSequence--;
+        loadSequence(currentSequence);
         
-        // Update the display
+        // Update the display and highlight the active button
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You're already on the first sequence.");
     }
 });
 
 document.getElementById('next-sequence').addEventListener('click', function() {
-    console.log("Next-sequence clicked!"); // Logging the click
     if (currentSequence < totalSequenceCount) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Load the next sequence's settings
-        loadSequence(currentSequence + 1);
+        // Increment the current sequence number and load its settings
+        currentSequence++;
+        loadSequence(currentSequence);
 
-        // Update the display
+        // Update the display and highlight the active button
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You're already on the last sequence.");
     }
