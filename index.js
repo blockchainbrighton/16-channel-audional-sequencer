@@ -3,10 +3,13 @@ let currentStep = 0;
 let totalStepCount = 0
 let beatCount = 1; // individual steps
 let barCount = 1; // bars
+
 let sequenceCount = 1;
 const sequenceLength = 64;
 const maxSequenceCount = 64; // sequences
 const allSequencesLength = 4096;
+const collectedURLs = Array(16).fill(''); 
+
 let timeoutId;
 let isPaused = false; // a flag to indicate if the sequencer is paused
 let pauseTime = 0;  // tracks the total paused time
@@ -265,6 +268,8 @@ continuousPlayButton.addEventListener('click', () => {
                     loadButton.addEventListener('click', () => {
                       if (audionalInput.value) {
                         const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalInput.value);
+                        console.log(audionalUrl); // or ipfsUrl
+                        collectedURLs[index] = audionalUrl; // Instead of using .push
                         fetchAudio(audionalUrl, index, loadSampleButton);
                         
                         // Add the orange margin to the channel container
@@ -273,6 +278,8 @@ continuousPlayButton.addEventListener('click', () => {
                         } else if (ipfsInput.value) {
                         // Handle IPFS address logic here
                         const ipfsUrl = 'https://ipfs.io/ipfs/' + ipfsInput.value;
+                        console.log(ipfsUrl); // or ipfsUrl
+                        collectedURLs[index] = ipfsUrl; // Instead of using .push
                         fetchAudio(ipfsUrl, index, loadSampleButton);
 
                         // Remove the orange margin from the channel container
@@ -328,6 +335,8 @@ continuousPlayButton.addEventListener('click', () => {
                       idLink.addEventListener('click', (e) => {
                           e.preventDefault();
                           const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalObj.id);
+                          console.log(audionalUrl); // or ipfsUrl
+                          collectedURLs[index] = audionalUrl; // Instead of using .push
                           fetchAudio(audionalUrl, index, loadSampleButton);
                           document.body.removeChild(idModal);
                       });
@@ -349,8 +358,9 @@ continuousPlayButton.addEventListener('click', () => {
                         idLink.addEventListener('click', (e) => {
                             e.preventDefault();
                             const audionalUrl = 'https://ordinals.com/content/' + getIDFromURL(audionalObj.id);
+                            console.log(audionalUrl); // or ipfsUrl
+                            collectedURLs[index] = audionalUrl; // Instead of using .push
                             fetchAudio(audionalUrl, index, loadSampleButton);
-                            document.body.removeChild(idModal);
                         });
                         idModalContent.appendChild(idLink);
                     });
@@ -358,6 +368,9 @@ continuousPlayButton.addEventListener('click', () => {
                     idModal.appendChild(idModalContent);
                     document.body.appendChild(idModal);
                 });
+                console.log("Collected URLs before adding to sequence arrays:", collectedURLs);
+                addURLsToSequenceArrays(collectedURLs);
+                
 
         });
 

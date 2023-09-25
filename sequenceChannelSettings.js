@@ -2,13 +2,67 @@
 
 let currentSequence = 1;
 let totalSequenceCount = 64;
-
-// Create an initial state for all 16 channels, with 64 steps each set to 'off' (false) plus a placeholder at the 0th index
-var channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
+let channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
 
 
-// We'll start with one sequence (sequence 1) 
-var sequences = [channelSettings];
+// Create an initial state for all 16 channels, with 64 steps each set to 'off' (false)
+let sequences = Array(totalSequenceCount).fill().map(() => Array(16).fill().map(() => [null].concat(Array(64).fill(false))));
+let sequenceBPMs = Array(totalSequenceCount).fill(0);  // Initialize with 0 BPM for all sequences
+
+// Create a function to update the channelSettings based on the currentSequence
+function updateChannelSettingsForSequence() {
+  if (jsonData[currentSequence - 1]) {
+    let sequenceData = jsonData[currentSequence - 1].channels;
+    sequenceData.forEach((channel, index) => {
+      channel.triggers.forEach(trigger => {
+        channelSettings[index][trigger] = true; // set the trigger step to 'on'
+      });
+    });
+  }
+}
+
+// Create a two-dimensional array to store the URLs for each channel for every sequence
+var channelURLs = Array(totalSequenceCount).fill().map(() => Array(16).fill(''));
+
+// Update the function to handle the new structure
+function updateChannelURLsForSequence() {
+  if (jsonData[currentSequence - 1]) {
+    let sequenceData = jsonData[currentSequence - 1].channels;
+    sequenceData.forEach((channel, index) => {
+      channelURLs[currentSequence - 1][index] = channel.url;
+    });
+  }
+}
+
+// A function to be called whenever the sequence changes or JSON data is loaded
+function onSequenceOrDataChange() {
+  // reset channelSettings to initial state
+  channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
+  // update the settings and URLs for the current sequence
+  updateChannelSettingsForSequence();
+  updateChannelURLsForSequence();
+  const currentUrls = channelURLs;
+  console.log(`URLs for Current Sequence (${currentSequence}) after data change:`, currentUrls);
+
+}
+
+// Function to add URLs to our structure
+function addURLsToSequenceArrays(urls) {
+    console.log("Received URLs to add:", urls);
+    urls.forEach((url, index) => {
+        channelURLs[currentSequence - 1][index] = url;
+    });
+    console.log("Updated channelURLs:", channelURLs);
+}
+
+// Call this function whenever the sequence changes
+function changeSequence(seq) {
+  currentSequence = seq;
+  onSequenceOrDataChange();
+}
+
+// Assuming your load button calls the loadJson function, make sure to also call onSequenceOrDataChange after loading new JSON data
+
 
 
 // Log initial channel settings
@@ -24,6 +78,13 @@ function loadChannelSettingsFromPreset(preset) {
         });
         channelSettings[channelIndex] = stepSettings;
         console.log(`Loaded settings for Channel-${channelIndex + 1}:`, channelSettings[channelIndex]);
+        
+        // Fetch audio data
+        if (channelData.url) {
+            const loadSampleButton = document.querySelector(`.channel[data-id="Channel-${channelIndex + 1}"] .load-sample-button`);
+            fetchAudio(channelData.url, channelIndex, loadSampleButton);
+            console.log(`Channel-${channelIndex + 1} fetchAudio called`);
+        }
     });
 
     // Save the loaded preset to the current sequence
@@ -67,31 +128,59 @@ function setChannelSettings(channelIndex, settings) {
 }
 
 function saveCurrentSequence(sequenceNumber) {
-    // If the sequence doesn't exist in the sequences array, initialize it
-    if (!sequences[sequenceNumber - 1]) {
-        sequences[sequenceNumber - 1] = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
-    }
-    // Copy the current channel settings to the sequence
-    sequences[sequenceNumber - 1] = JSON.parse(JSON.stringify(channelSettings));
+    sequences[sequenceNumber - 1] = [...channelSettings];
     console.log(`Saved settings for Sequence ${sequenceNumber}:`, sequences[sequenceNumber - 1]);
+    const urlsForSavedSequence = channelSettings.map(channelData => channelData[0]);
+    console.log(`Saved URLs for Sequence ${sequenceNumber}:`, urlsForSavedSequence);
+
 }
 
 
 
 function loadSequence(sequenceNumber) {
+
+    // Check if the sequence exists and initialize if not
     if (!sequences[sequenceNumber - 1]) {
         // If the sequence doesn't exist, initialize it with default settings
         sequences[sequenceNumber - 1] = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
     }
-    channelSettings = sequences[sequenceNumber - 1];
-    console.log(`Loaded settings for Sequence ${sequenceNumber}:`, channelSettings);
+    
+    const sequenceChannels = sequences[sequenceNumber - 1];
+    if (!sequenceChannels) {
+        console.error(`Sequence ${sequenceNumber} is not found in sequences.`, sequences);
+        return;
+    }
+
+    if (!Array.isArray(sequenceChannels)) {
+        console.error(`Sequence ${sequenceNumber} is not an array.`, sequenceChannels);
+        return;
+    }
+    const urlsForSequence = sequenceChannels.map(channelData => channelData[0]);
+    console.log(`URLs for Sequence ${sequenceNumber}:`, urlsForSequence);
+
+    // Loaded settings for Sequence
+    console.log(`Loaded settings for Sequence ${sequenceNumber}:`, sequenceChannels);
 
     // Update the UI to reflect the loaded sequence
     updateUIForSequence(sequenceNumber);
 
     // Update the currentSequence
     currentSequence = sequenceNumber;
+
+    sequenceChannels.forEach((channelData, channelIndex) => {
+        const currentUrl = channelData[0]; // Assuming the URL is at the 0th index of channelData array
+        const channelElement = document.querySelector(`.channel[data-id="Channel-${channelIndex + 1}"]`);
+        const previousUrl = channelElement.dataset.originalUrl;
+
+        if (currentUrl && currentUrl !== previousUrl) {
+            const loadSampleButton = channelElement.querySelector('.load-sample-button');
+            fetchAudio(currentUrl, channelIndex, loadSampleButton);
+        }
+    });
 }
+
+
+
 
 
 function loadNextSequence() {
