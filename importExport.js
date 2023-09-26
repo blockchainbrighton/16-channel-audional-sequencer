@@ -7,6 +7,7 @@ const EMPTY_CHANNEL = {
     "url": ""
 };
 
+let sequenceBPMs = Array(totalSequenceCount).fill(105);  // Initialize with 0 BPM for all sequences
 
 
 function exportSettings() {
@@ -77,9 +78,21 @@ function importSettings(settings) {
         return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
     }
 
+    sequenceBPMs = [];  // Clear the sequenceBPMs array before filling it with new BPM values
+    console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after clearing the array
+
     if (!Array.isArray(parsedSettings) && sequences.length > 0) {
         if (isValidSequence(parsedSettings)) {
-            sequences.push(convertSequenceSettings(parsedSettings)); // Add the new sequence to the existing sequences
+            sequences.push(convertSequenceSettings(parsedSettings));
+            sequenceBPMs.push(parsedSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
+
+            // Update the BPM slider and display with the imported value
+            let bpm = parsedSettings.bpm;
+            let bpmSlider = document.getElementById('bpm-slider');
+            let bpmDisplay = document.getElementById('bpm-display');
+            bpmSlider.value = bpm;
+            bpmDisplay.innerText = bpm;
+            bpmSlider.dispatchEvent(new Event('input'));
         } else {
             console.error("Imported JSON doesn't match expected format.");
             return;
@@ -95,32 +108,27 @@ function importSettings(settings) {
             }
         }
 
-        // If it's an array of sequences, check if the BPM is provided in the first sequence
-        if (parsedSettings[0] && parsedSettings[0].bpm) {
-            bpm = parsedSettings[0].bpm;
-            
-            // Get the bpm slider and display elements
-            let bpmSlider = document.getElementById('bpm-slider');
-            let bpmDisplay = document.getElementById('bpm-display');
-            
-            // Update the bpm slider and display
-            bpmSlider.value = bpm;
-            bpmDisplay.innerText = bpm;  // update the bpm text label
-        
-            // Manually trigger the input event to update the sequencer's bpm
-            bpmSlider.dispatchEvent(new Event('input'));
-
-            currentBPM = parsedSettings[0].bpm;
-        }
-
         sequences = parsedSettings.map(seqSettings => {
             if (isValidSequence(seqSettings)) {
+                sequenceBPMs.push(seqSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
+
+                // Update the BPM slider and display with the imported value for each sequence
+                let bpm = seqSettings.bpm;
+                let bpmSlider = document.getElementById('bpm-slider');
+                let bpmDisplay = document.getElementById('bpm-display');
+                bpmSlider.value = bpm;
+                bpmDisplay.innerText = bpm;
+                bpmSlider.dispatchEvent(new Event('input'));
+
                 return convertSequenceSettings(seqSettings);
             } else {
                 console.error("One of the sequences in the imported array doesn't match the expected format.");
                 return null;
             }
         }).filter(Boolean); // Filter out any invalid sequences
+
+        console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after processing all sequences
+
     }
 
     currentSequence = sequences.length; // Set the last sequence as the current sequence

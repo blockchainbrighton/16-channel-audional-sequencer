@@ -7,7 +7,6 @@ let channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(fa
 
 // Create an initial state for all 16 channels, with 64 steps each set to 'off' (false)
 let sequences = Array(totalSequenceCount).fill().map(() => Array(16).fill().map(() => [null].concat(Array(64).fill(false))));
-let sequenceBPMs = Array(totalSequenceCount).fill(0);  // Initialize with 0 BPM for all sequences
 
 // Create a function to update the channelSettings based on the currentSequence
 function updateChannelSettingsForSequence() {
@@ -144,6 +143,15 @@ function loadSequence(sequenceNumber) {
         // If the sequence doesn't exist, initialize it with default settings
         sequences[sequenceNumber - 1] = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
     }
+
+    // Set the BPM slider and display to match the current sequence's BPM
+    let bpm = sequenceBPMs[sequenceNumber - 1];  // Get the BPM for the current sequence
+    let bpmSlider = document.getElementById('bpm-slider');
+    let bpmDisplay = document.getElementById('bpm-display');
+    bpmSlider.value = bpm;
+    bpmDisplay.innerText = bpm;
+    bpmSlider.dispatchEvent(new Event('input')); // Update the sequencer's BPM
+
     
     const sequenceChannels = sequences[sequenceNumber - 1];
     if (!sequenceChannels) {
@@ -194,13 +202,24 @@ function loadNextSequence() {
         // Load the next sequence's settings
         loadSequence(currentSequence);
 
-        // Update the display
+        // Update the displayed number
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You've reached the last sequence.");
     }
 }
 
+function updateActiveQuickPlayButton() {
+    // Remove 'active' class from all buttons
+    quickPlayButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Add 'active' class to current sequence button
+    const activeBtn = quickPlayButtons[currentSequence - 1];
+    activeBtn.classList.add('active');
+}
 
 function updateUIForSequence(sequenceNumber) {
     if (sequenceNumber > 0 && sequenceNumber <= sequences.length) {
@@ -232,16 +251,53 @@ function updateUIForSequence(sequenceNumber) {
     });
 }
 
+
+function insertQuickPlayButtons() {
+    console.log("insertQuickPlayButtons called!");
+
+    const checkBox = document.getElementById('continuous-play');
+    const quickPlayButton = document.getElementById('quick-play-button');
+
+    if (checkBox && quickPlayButton) {
+        for (let j = 0; j < 16; j++) {
+            const quickBtn = createQuickPlayButton(j + 1);
+            console.log(`Created Quick Play Button for Sequence_${j+1}`);
+            checkBox.parentNode.insertBefore(quickBtn, quickPlayButton);
+            console.log(`Added Quick Play Button for Sequence_${j+1} to DOM`);
+        }
+    } else {
+        console.error("Either checkBox or quickPlayButton is missing!");
+    }
+}
+
+insertQuickPlayButtons();
+
+// Now that the quickplay buttons have been inserted, we can set up their event listeners.
+quickPlayButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const sequenceIndex = parseInt(button.dataset.sequenceIndex, 10);
+        currentSequence = sequenceIndex;
+        loadSequence(sequenceIndex);
+
+        // Update the display and highlight the active button
+        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
+    });
+});
+
+
 document.getElementById('prev-sequence').addEventListener('click', function() {
     if (currentSequence > 1) {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Load the previous sequence's settings
-        loadSequence(currentSequence - 1);
+        // Decrement the current sequence number and load its settings
+        currentSequence--;
+        loadSequence(currentSequence);
         
-        // Update the display
+        // Update the display and highlight the active button
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You're already on the first sequence.");
     }
@@ -252,13 +308,14 @@ document.getElementById('next-sequence').addEventListener('click', function() {
         // Save current sequence's settings
         saveCurrentSequence(currentSequence);
 
-        // Load the next sequence's settings
-        loadSequence(currentSequence + 1);
+        // Increment the current sequence number and load its settings
+        currentSequence++;
+        loadSequence(currentSequence);
 
-        // Update the display
+        // Update the display and highlight the active button
         document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        updateActiveQuickPlayButton();
     } else {
         console.warn("You're already on the last sequence.");
     }
 });
-

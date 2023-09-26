@@ -290,86 +290,6 @@ div[idModalContent] div a:hover {
     z-index: 1;
 }
 
-
-
-/* --- Animations --- */
-@keyframes flash {
-    0%   { background-color: var(--primary-color); }
-    50%  { background-color: #00ff00; }
-    100% { background-color: var(--primary-color); }
-}
-
-
-/* --- LOWER Button and Container Styles --- */
-.new-button-container {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    text-align: right;
-}
-
-.new-button {
-    padding: 10px 20px;
-    color: black;
-    background-color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.75em;
-    font-weight: bold;
-    box-shadow: var(--box-shadow-style);
-    cursor: pointer;
-    margin-left: auto;
-}
-
-.new-button-subtext {
-    display: block;
-    font-size: 1em;
-    color: var(--primary-color);
-    opacity: 0.7;
-}
-
-/* --- Mode Switcher Styles --- */
-.mode-switcher {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 50px;
-}
-
-.mode-switcher label {
-    margin-right: 10px;
-}
-
-.mode-switcher input[type="checkbox"] {
-    appearance: none;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 10px;
-    position: relative;
-    cursor: pointer;
-}
-
-.mode-switcher input[type="checkbox"]:checked {
-    background-color: #2196f3;
-}
-
-.mode-switcher input[type="checkbox"]::before {
-    content: "";
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 18px;
-    height: 18px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-}
-
-.mode-switcher input[type="checkbox"]:checked::before {
-    transform: translateX(20px);
-}
-
 /* --- Steps and Sequence Light Styles --- */
 #sequence-lights {
     display: flex;
@@ -421,6 +341,105 @@ div[idModalContent] div a:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 0;
+}
+
+/* --- Animations --- */
+@keyframes flash {
+    0%   { background-color: var(--primary-color); }
+    50%  { background-color: #00ff00; }
+    100% { background-color: var(--primary-color); }
+}
+
+
+/* --- LOWER Button and Container Styles --- */
+.new-button-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+}
+
+
+
+/* --- Mode Switcher Styles --- */
+.mode-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 50px;
+}
+
+.mode-switcher label {
+    margin-right: 10px;
+}
+
+.mode-switcher input[type="checkbox"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.mode-switcher input[type="checkbox"]:checked {
+    background-color: #2196f3;
+}
+
+.mode-switcher input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.mode-switcher input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
+}
+
+#save-button, #load-button {
+  margin-left: 2px; /* Add some space between buttons */
+  right: 0px;
+}
+
+/* CSS for evenly spacing "Quick Play" buttons between the checkbox and "Save/Load" buttons */
+.button-container {
+  align-items: center;
+  justify-content: space-between; /* Space items evenly */
+}
+
+.quick-play-button {
+    width: 24px; /* Adjust the width as needed */
+    height: 24px; /* Adjust the height as needed */
+    background-color: green;
+    display: inline-flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+    margin: 0 15px; /* Margin to space buttons */
+    cursor: pointer; /* Add pointer cursor to indicate interactivity */
+}
+
+.quick-play-button strong {
+    display: block; /* Ensure the <strong> element takes full width */
+    font-weight: bold;
+}
+
+.quick-play-button.active {
+    background-color: limegreen; /* Change to bright green when active */
+}
+
+/* Reduce the font size and padding for the buttons */
+#prev-sequence,
+#next-sequence,
+button[for="mode-switcher"] {
+    font-size: 5px; /* Adjust the font size as needed */
+    padding: 5px 10px; /* Adjust the padding as needed */
 }
 
 
