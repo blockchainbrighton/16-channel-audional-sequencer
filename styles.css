@@ -405,7 +405,7 @@ div[idModalContent] div a:hover {
 
 #save-button, #load-button {
   margin-left: 2px; /* Add some space between buttons */
-  left: 0px;
+  right: 0px;
 }
 
 /* CSS for evenly spacing "Quick Play" buttons between the checkbox and "Save/Load" buttons */
@@ -415,16 +415,31 @@ div[idModalContent] div a:hover {
 }
 
 .quick-play-button {
-    width: 25px;
-    height: 25px;
+    width: 24px; /* Adjust the width as needed */
+    height: 24px; /* Adjust the height as needed */
     background-color: green;
-    display: inline-block;
-    margin: 0 15px; /* some margin to space it out between the checkbox and save button */
-    vertical-align: middle; /* align with other inline elements */
+    display: inline-flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+    margin: 0 15px; /* Margin to space buttons */
+    cursor: pointer; /* Add pointer cursor to indicate interactivity */
+}
+
+.quick-play-button strong {
+    display: block; /* Ensure the <strong> element takes full width */
+    font-weight: bold;
 }
 
 .quick-play-button.active {
     background-color: limegreen; /* Change to bright green when active */
+}
+
+/* Reduce the font size and padding for the buttons */
+#prev-sequence,
+#next-sequence,
+button[for="mode-switcher"] {
+    font-size: 5px; /* Adjust the font size as needed */
+    padding: 5px 10px; /* Adjust the padding as needed */
 }
 
 
