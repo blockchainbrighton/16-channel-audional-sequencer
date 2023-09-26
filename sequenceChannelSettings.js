@@ -2,36 +2,50 @@
 
 let currentSequence = 1;
 let totalSequenceCount = 64;
-let channelSettings = Array(16).fill().map(() => [null].concat(Array(64).fill(false)));
 
 
 // Create an initial state for all 16 channels, with 64 steps each set to 'off' (false)
-let sequences = Array(totalSequenceCount).fill().map(() => Array(16).fill().map(() => [null].concat(Array(64).fill(false))));
 
-// Create a function to update the channelSettings based on the currentSequence
-function updateChannelSettingsForSequence() {
-  if (jsonData[currentSequence - 1]) {
-    let sequenceData = jsonData[currentSequence - 1].channels;
-    sequenceData.forEach((channel, index) => {
-      channel.triggers.forEach(trigger => {
-        channelSettings[index][trigger] = true; // set the trigger step to 'on'
-      });
-    });
-  }
+// Utility function to create an array with a default value
+function createArray(length, defaultValue) {
+    return Array(length).fill(defaultValue);
 }
+
+let channelSettings = createArray(16, [null].concat(createArray(64, false)));
+let sequences = createArray(totalSequenceCount, createArray(16, [null].concat(createArray(64, false))));
+
+
+function updateSequenceData(callback) {
+    const sequenceData = jsonData[currentSequence - 1];
+    if (sequenceData) {
+        callback(sequenceData);
+    }
+}
+
+function updateChannelSettingsForSequence() {
+    updateSequenceData((sequenceData) => {
+        sequenceData.channels.forEach((channel, index) => {
+            channel.triggers.forEach(trigger => {
+                channelSettings[index][trigger] = true; // set the trigger step to 'on'
+            });
+        });
+    });
+}
+
+function updateChannelURLsForSequence() {
+    updateSequenceData((sequenceData) => {
+        sequenceData.channels.forEach((channel, index) => {
+            channelURLs[currentSequence - 1][index] = channel.url;
+        });
+    });
+}
+
+
+
 
 // Create a two-dimensional array to store the URLs for each channel for every sequence
 var channelURLs = Array(totalSequenceCount).fill().map(() => Array(16).fill(''));
 
-// Update the function to handle the new structure
-function updateChannelURLsForSequence() {
-  if (jsonData[currentSequence - 1]) {
-    let sequenceData = jsonData[currentSequence - 1].channels;
-    sequenceData.forEach((channel, index) => {
-      channelURLs[currentSequence - 1][index] = channel.url;
-    });
-  }
-}
 
 // A function to be called whenever the sequence changes or JSON data is loaded
 function onSequenceOrDataChange() {
@@ -203,12 +217,19 @@ function loadNextSequence() {
         loadSequence(currentSequence);
 
         // Update the displayed number
-        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
+        const sequenceDisplayElement = document.getElementById('current-sequence-display');
+        if (sequenceDisplayElement) {
+            sequenceDisplayElement.textContent = 'Sequence ' + currentSequence;
+        }
+        
         updateActiveQuickPlayButton();
     } else {
         console.warn("You've reached the last sequence.");
     }
 }
+
+// Use loadNextSequence inside the event listener
+document.getElementById('next-sequence').addEventListener('click', loadNextSequence);
 
 function updateActiveQuickPlayButton() {
     // Remove 'active' class from all buttons
@@ -303,19 +324,3 @@ document.getElementById('prev-sequence').addEventListener('click', function() {
     }
 });
 
-document.getElementById('next-sequence').addEventListener('click', function() {
-    if (currentSequence < totalSequenceCount) {
-        // Save current sequence's settings
-        saveCurrentSequence(currentSequence);
-
-        // Increment the current sequence number and load its settings
-        currentSequence++;
-        loadSequence(currentSequence);
-
-        // Update the display and highlight the active button
-        document.getElementById('current-sequence-display').textContent = `Sequence ${currentSequence}`;
-        updateActiveQuickPlayButton();
-    } else {
-        console.warn("You're already on the last sequence.");
-    }
-});

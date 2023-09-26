@@ -60,6 +60,8 @@ function exportSettings() {
 
 function importSettings(settings) {
     let parsedSettings;
+    let sequenceNames = []; // Initialize an empty array to store sequence names
+
 
     try {
         parsedSettings = JSON.parse(settings);
@@ -77,6 +79,19 @@ function importSettings(settings) {
     function isValidSequence(seq) {
         return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
     }
+
+    sequences = parsedSettings.map(seqSettings => {
+        if (isValidSequence(seqSettings)) {
+            sequenceNames.push(seqSettings.name); // Extract the name and store it in the sequenceNames array
+            // ... (rest of the code remains unchanged)
+        } else {
+            console.error("One of the sequences in the imported array doesn't match the expected format.");
+            return null;
+        }
+    }).filter(Boolean); // Filter out any invalid sequences
+
+    console.log("Extracted sequence names:", sequenceNames); // Log the extracted sequence names
+
 
     sequenceBPMs = [];  // Clear the sequenceBPMs array before filling it with new BPM values
     console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after clearing the array
