@@ -30,14 +30,17 @@ function renderPlayhead(buttons, currentStep, isMuted) {
     });
 }
 
+
+
 function playStep() {
     const presetData = presets.preset1;
+    const presetChannels = presetData.channels;
 
     // Only iterate over active channels
     activeChannels.forEach((channelIndex) => {
         const channel = channels[channelIndex];
         const buttons = channel.querySelectorAll('.step-button');
-        let channelData = presetData.channels[channelIndex];
+        let channelData = presetChannels[channelIndex];
         const defaultTriggerArray = Array(4096).fill(false);
 
         // If no channelData is found for the current channel, use a default set of values

@@ -1,0 +1,10 @@
+/* --- Drum Machine Container --- */
+#drum-machine {
+    width: 95%;
+    height: 95%;
+    margin: 0 auto;
+    padding: 0;
+    background-color: var(--secondary-bg-color);
+    border: 5px solid var(--main-bg-color);
+    box-sizing: border-box;
+}

@@ -1,0 +1,48 @@
+/* --- Button Specific Styles --- */
+#play {
+    animation: flash 2s infinite ease-in-out;
+}
+
+#play.selected, 
+#stop.selected ~ #play {
+    animation: none;
+}
+
+#stop.selected ~ #play, .step-button.selected, .mute-button.selected, .solo-button.selected {
+    background-color: var(--accent-color);
+}
+
+.clear-button {
+    background-color: #ff0;
+}
+
+.mute-button {
+    background-color: #800;
+}
+
+.solo-button {
+    background-color: rgb(253, 204, 114);
+}
+
+.solo-button.selected {
+    background-color: darkorange;
+}
+
+.load-sample-button {
+    flex: 1;
+    overflow: auto;
+    text-overflow: ellipsis;
+    font-size: 0.5em;
+    height: 20px;
+    min-width: 100px;
+    padding: 5px;
+}
+
+.load-sample-button:hover::after {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--primary-color);
+    color: var(--main-bg-color);
+    z-index: 1;
+}

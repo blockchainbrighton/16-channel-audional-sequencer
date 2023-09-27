@@ -1,0 +1,21 @@
+/* lowerButtonStyles.css */
+
+.new-button-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+}
+
+/* Reduce the font size and padding for the buttons */
+#prev-sequence,
+#next-sequence,
+button[for="mode-switcher"] {
+    font-size: 10px; /* Adjust the font size as needed */
+    padding: 5px 10px; /* Adjust the padding as needed */
+}
+
+#current-sequence-display {
+    margin: 10px;
+    color: rgb(217, 255, 0); /* Use the 'color' property to set the text color */
+}

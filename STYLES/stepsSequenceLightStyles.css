@@ -1,0 +1,59 @@
+/* --- Steps and Sequence Light Styles --- */
+#sequence-lights {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+    margin-left: 10%;
+}
+
+.sequence-light {
+    grid-column: span 1;
+  
+}
+
+.sequence-light {
+    height: 15px;
+    background-color: grey;
+}
+
+.sequence-light.on {
+    background-color: greenyellow;
+}
+
+/* --- Tooltip Styles --- */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    max-width: 150px; /* Reduce the width */
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px; /* Reduce the padding */
+    position: absolute;
+    z-index: 1;
+    bottom: -15%; /* Adjust the position */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px; /* Reduce the font size */
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 0;
+}
+
+/* --- Animations --- */
+@keyframes flash {
+    0%   { background-color: var(--primary-color); }
+    50%  { background-color: #00ff00; }
+    100% { background-color: var(--primary-color); }
+}

@@ -1,0 +1,35 @@
+/* CSS for evenly spacing "Quick Play" buttons between the checkbox and "Save/Load" buttons */
+
+   
+.quickplay-button-container {
+    position: absolute;
+    bottom: 6vh;
+    right: 0;
+    left: 28.5vw;
+    margin: 10px; /* Adjust the margin as needed */
+    display: flex;
+    align-items: center;
+}
+
+.quickplay-button {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin: 10px;
+    background-color: #888; /* Darker background for inactive state */
+    border: 1px solid #999;
+    cursor: pointer;
+    text-align: center; /* Center the text horizontally */
+    line-height: 30px; /* Center the text vertically */
+    opacity: 0.5; /* Dimmer appearance for inactive state */
+}
+
+.quickplay-button strong {
+    font-weight: bold;
+    color: black;
+}
+
+.quickplay-button.active {
+    background-color: limegreen; /* Change to bright green when active */
+    opacity: 1; /* Fully lit appearance for active state */
+}

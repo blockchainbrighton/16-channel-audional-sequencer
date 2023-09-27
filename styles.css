@@ -1,173 +1,17 @@
-/* --- Variables (Theme) --- */
-:root {
-    --scale-factor: 1vw;
-    --main-bg-color: #000;
-    --secondary-bg-color: #333;
-    --primary-color: #fff;
-    --accent-color: #f00;
-    --button-dimension: 50px;
-    --control-button-dimension: 18px;
-    --step-button-max-width: 18px;
-    --step-button-max-height: calc(18px * var(--scale-factor));    
-    --box-shadow-style: 0 0 10px var(--main-bg-color) inset;
-    --default-font: Arial, sans-serif;
-}
-@media (max-width: 1200px) {
-    #main-container {
-        transform: scale(0.9);
-    }
-}
-
-@media (max-width: 1000px) {
-    #main-container {
-        transform: scale(0.8);
-    }
-}
-
-@media (max-width: 800px) {
-    #main-container {
-        transform: scale(0.7);
-    }
-}
-
-@media (max-width: 600px) {
-    #main-container {
-        transform: scale(0.6);
-    }
-}
-
-/* --- Global Styles --- */
-body {
-    background-color: var(--main-bg-color);
-    color: var(--primary-color);
-    font: normal normal normal 100%/1 var(--default-font);
-}
-
-/* --- Drum Machine Container --- */
-#drum-machine {
-    width: 95%; /* Updated width to ensure 95% of the page */
-    margin: 0 auto;
-    padding: 0;
-    background-color: var(--secondary-bg-color);
-    border: 5px solid var(--main-bg-color);
-    box-sizing: border-box; /* Include padding and border in the total width */
-}
-
-/* --- Headers & Text Elements --- */
-h1 {
-    text-align: center;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-}
-
-h3 .subtext {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-h3:hover .subtext {
-    font-size: 1em;
-    opacity: 0.5;
-}
-
-.title {
-    font-size: 40px;
-}
-
-.small-text, .smaller-text {
-    font-size: 20px;
-}
-
-.larger-text {
-    font-size: 1.5em;
-}
-
-.centered, .centered-text {
-    display: block;
-    text-align: center;
-}
-
-.bright-orange {
-    color: #f7931a;
-}
-
-/* --- Buttons & Controls --- */
-.button, h1 .button {
-    border: none;
-    background-color: var(--primary-color);
-    cursor: pointer;
-    box-shadow: var(--box-shadow-style);
-    padding: 10px;
-    color: var(--main-bg-color);
-    font-size: 1em;
-}
-
-.control-button {
-    width: var(--control-button-dimension);
-    height: var(--control-button-dimension);
-}
-
-.play-button, .stop-button {
-    position: relative;
-    width: var(--button-dimension);
-    height: var(--button-dimension);
-}
-
-#play.selected {
-    background-color: #00ff00;
-}
-
-.stop-button {
-    background-color: var(--accent-color);
-}
-
-.button-label.stop {
-    color: #ff0000; /* Red */
-}
-
-/* Container for each sample's play button and name */
-div[idModalContent] div {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-/* Play button next to each sample name */
-div[idModalContent] div button {
-    margin-right: 10px;
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-/* Hover effect for play button */
-div[idModalContent] div button:hover {
-    background-color: #ddd;
-}
-
-/* Sample name styling */
-div[idModalContent] div a {
-    text-decoration: none;
-    display: flex;
-    color: black;
-    transition: color 0.3s ease;
-}
-
-/* Hover effect for sample name */
-div[idModalContent] div a:hover {
-    color: #666;
-}
+/* Import other CSS files */
+/* Import other CSS files */
+@import 'STYLES/variables.css';          /* Import variables and global styles */
+@import 'STYLES/drumMachine.css';        /* Import drum machine container styles */
+@import 'STYLES/headersTextElements.css'; /* Import headers and text elements styles */
+@import 'STYLES/buttonsControls.css';     /* Import buttons and controls styles */
+@import 'STYLES/samplePlayButtons.css';    /* Import sample play buttons and name styles */
+@import 'STYLES/channelElements.css';      /* Import channel elements styles */
+@import 'STYLES/containersLayout.css';      /* Import container layout styles */
+@import 'STYLES/buttonSpecificStyles.css'; /* Import button specific styles */
+@import 'STYLES/stepsSequenceLightStyles.css'; /* Import Steps and Sequence Light Styles */
+@import 'STYLES/modeSwitcherStyles.css';      /* Import Mode Switcher Styles */
+@import 'STYLES/lowerButtonStyles.css'; /* Import Lower Button and Container Styles */
+@import 'STYLES/quickplayButtons.css'; /* Import Quick Play Buttons Styles */
 
 /* --- Channel Elements --- */
 .channel {
@@ -181,265 +25,67 @@ div[idModalContent] div a:hover {
     border: 2px solid #f7931a; /* or whatever shade of orange you prefer */
 }
 
-/* Media query for screens smaller than 600px */
-@media (max-width: 600px) {
-    .channel {
-        width: 100%; /* Full width on small screens */
-    }
-}
-
-
-
-
-
-/* --- Containers & Layout --- */
-.steps-container {
-    flex-wrap: wrap;
-    gap: 0px;
-}
-
-.button-container, .subtext-container {
-    display: flex;
-    align-items: center;
-}
-
-.step-button:nth-child(4n+1):not(:nth-child(16n+1)) {
-    background-color: #add8e6; /* light blue */
-}
-
-.step-button:nth-child(16n+1) {
-    background-color: #ffff00; /* yellow */
-}
-
-/* Increase specificity for selected state to override nth colors */
-.step-button.selected,
-.step-button.selected:nth-child(4n+1):not(:nth-child(16n+1)),
-.step-button.selected:nth-child(16n+1) {
-    background-color: var(--accent-color);
-}
-
-.step-button.playing {
-    box-shadow: 0 0 10px rgb(150, 150, 150) inset;
-}
-
-.step-button.playing.selected {
-    box-shadow: 0 0 10px rgb(150, 1, 1) inset;
-}
-
-.step-button {
-    position: relative;
-    width: var(--step-button-max-width);  /* Set the width */
-    height: var(--step-button-max-width);  /* Set the height equal to the width */
-    background-color: #555;
-    color: #fff;
-    max-width: var(--step-button-max-width);
-    max-height: var(--step-button-max-height);
-}
-
-
-.channel-controls {
-    margin-top: 0px;
-}
-
-/* --- Button Specific Styles --- */
-#play {
-    animation: flash 2s infinite ease-in-out;
-}
-
-#play.selected, 
-#stop.selected ~ #play {
-    animation: none;
-}
-
-#stop.selected ~ #play, .step-button.selected, .mute-button.selected, .solo-button.selected {
-    background-color: var(--accent-color);
-}
-
-.clear-button {
-    background-color: #ff0;
-}
-
-.mute-button {
-    background-color: #800;
-}
-
-.solo-button {
-    background-color: rgb(253, 204, 114);
-}
-
-.solo-button.selected {
-    background-color: darkorange;
-}
-
-.load-sample-button {
-    flex: 1;
-    overflow: auto;
-    text-overflow: ellipsis;
-    font-size: 0.5em;
-    height: 20px;
-    min-width: 100px;
-    padding: 5px;
-}
-
-.load-sample-button:hover::after {
+.color-picker {
+    display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
-    background: var(--primary-color);
-    color: var(--main-bg-color);
-    z-index: 1;
+    border: 1px solid #000;
+    width: 100px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    z-index: 1000; /* or any high value */
 }
 
-/* --- Steps and Sequence Light Styles --- */
-#sequence-lights {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
-    margin-left: 10%;
-}
-
-.sequence-light {
-    grid-column: span 1;
-  
-}
-
-.sequence-light {
-    height: 15px;
-    background-color: grey;
-}
-
-.sequence-light.on {
-    background-color: greenyellow;
-}
-
-/* --- Tooltip Styles --- */
-.tooltip {
-    position: relative;
-    display: inline-block;
+.color-option {
+    width: 20px;
+    height: 20px;
     cursor: pointer;
 }
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    max-width: 150px; /* Reduce the width */
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 5px; /* Reduce the padding */
-    position: absolute;
-    z-index: 1;
-    bottom: -15%; /* Adjust the position */
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 12px; /* Reduce the font size */
+.play-mode-container {
+    margin-left: 50px; /* Adjust margin as needed */
 }
 
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 0;
-}
-
-/* --- Animations --- */
-@keyframes flash {
-    0%   { background-color: var(--primary-color); }
-    50%  { background-color: #00ff00; }
-    100% { background-color: var(--primary-color); }
-}
-
-
-/* --- LOWER Button and Container Styles --- */
-.new-button-container {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    text-align: right;
-}
-
-
-
-/* --- Mode Switcher Styles --- */
-.mode-switcher {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 50px;
-}
-
-.mode-switcher label {
+.play-mode-text {
     margin-right: 10px;
+    color: black;
 }
-
-.mode-switcher input[type="checkbox"] {
-    appearance: none;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 10px;
-    position: relative;
+.play-mode-checkbox {
+    display: none;
+  }
+  
+  .play-mode-button {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
     cursor: pointer;
+    color: black;
+    background-color: #7b7b7b; /* Default grey background */
+    transition: background-color 0.3s;
 }
 
-.mode-switcher input[type="checkbox"]:checked {
-    background-color: #2196f3;
+/* When Loop is selected (checkbox is not checked) */
+.play-mode-checkbox:not(:checked) + .loop-label {
+    background-color: #ffffff; /* White background */
 }
 
-.mode-switcher input[type="checkbox"]::before {
-    content: "";
+.play-mode-checkbox:not(:checked) + .loop-label + .continuous-label {
+    background-color: #7b7b7b; /* Grey background */
+}
+
+/* When Continuous is selected (checkbox is checked) */
+.play-mode-checkbox:checked + .loop-label {
+    background-color: #7b7b7b; /* Grey background */
+}
+
+.play-mode-checkbox:checked + .loop-label + .continuous-label {
+    background-color: #ffffff; /* White background */
+}
+
+.save-load-buttons-container {
     position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 18px;
-    height: 18px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-}
-
-.mode-switcher input[type="checkbox"]:checked::before {
-    transform: translateX(20px);
-}
-
-#save-button, #load-button {
-  margin-left: 2px; /* Add some space between buttons */
-  right: 0px;
-}
-
-/* CSS for evenly spacing "Quick Play" buttons between the checkbox and "Save/Load" buttons */
-.button-container {
-  align-items: center;
-  justify-content: space-between; /* Space items evenly */
-}
-
-.quick-play-button {
-    width: 24px; /* Adjust the width as needed */
-    height: 24px; /* Adjust the height as needed */
-    background-color: green;
-    display: inline-flex;
-    justify-content: center; /* Center the content horizontally */
-    align-items: center; /* Center the content vertically */
-    margin: 0 15px; /* Margin to space buttons */
-    cursor: pointer; /* Add pointer cursor to indicate interactivity */
-}
-
-.quick-play-button strong {
-    display: block; /* Ensure the <strong> element takes full width */
-    font-weight: bold;
-}
-
-.quick-play-button.active {
-    background-color: limegreen; /* Change to bright green when active */
-}
-
-/* Reduce the font size and padding for the buttons */
-#prev-sequence,
-#next-sequence,
-button[for="mode-switcher"] {
-    font-size: 5px; /* Adjust the font size as needed */
-    padding: 5px 10px; /* Adjust the padding as needed */
+    bottom: 50px;
+    right: 0;
+    left: 88vw;
+    margin: 10px;
 }
 
 

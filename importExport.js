@@ -56,105 +56,13 @@ function exportSettings() {
     return { settings: JSON.stringify(allSequencesSettings, null, 2), filename: filename };
 }
 
+// Helper Functions
 
-
-function importSettings(settings) {
-    let parsedSettings;
-    let sequenceNames = []; // Initialize an empty array to store sequence names
-
-
-    try {
-        parsedSettings = JSON.parse(settings);
-    } catch (error) {
-        console.error("Error parsing settings:", error);
-        return;
-    }
-
-    if (parsedSettings.urls && Array.isArray(parsedSettings.urls)) {
-        // Assuming collectedURLs is an array, you can concatenate it with new URLs
-        collectedURLs = collectedURLs.concat(parsedSettings.urls);
-    }
-
-    // Utility function to check if the structure is valid
-    function isValidSequence(seq) {
-        return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
-    }
-
-    sequences = parsedSettings.map(seqSettings => {
-        if (isValidSequence(seqSettings)) {
-            sequenceNames.push(seqSettings.name); // Extract the name and store it in the sequenceNames array
-            // ... (rest of the code remains unchanged)
-        } else {
-            console.error("One of the sequences in the imported array doesn't match the expected format.");
-            return null;
-        }
-    }).filter(Boolean); // Filter out any invalid sequences
-
-    console.log("Extracted sequence names:", sequenceNames); // Log the extracted sequence names
-
-
-    sequenceBPMs = [];  // Clear the sequenceBPMs array before filling it with new BPM values
-    console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after clearing the array
-
-    if (!Array.isArray(parsedSettings) && sequences.length > 0) {
-        if (isValidSequence(parsedSettings)) {
-            sequences.push(convertSequenceSettings(parsedSettings));
-            sequenceBPMs.push(parsedSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
-
-            // Update the BPM slider and display with the imported value
-            let bpm = parsedSettings.bpm;
-            let bpmSlider = document.getElementById('bpm-slider');
-            let bpmDisplay = document.getElementById('bpm-display');
-            bpmSlider.value = bpm;
-            bpmDisplay.innerText = bpm;
-            bpmSlider.dispatchEvent(new Event('input'));
-        } else {
-            console.error("Imported JSON doesn't match expected format.");
-            return;
-        }
-    } else {
-        // Ensure that if it's a single sequence, it's converted into an array format
-        if (!Array.isArray(parsedSettings)) {
-            if (isValidSequence(parsedSettings)) {
-                parsedSettings = [parsedSettings];
-            } else {
-                console.error("Imported JSON doesn't match expected format.");
-                return;
-            }
-        }
-
-        sequences = parsedSettings.map(seqSettings => {
-            if (isValidSequence(seqSettings)) {
-                sequenceBPMs.push(seqSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
-
-                // Update the BPM slider and display with the imported value for each sequence
-                let bpm = seqSettings.bpm;
-                let bpmSlider = document.getElementById('bpm-slider');
-                let bpmDisplay = document.getElementById('bpm-display');
-                bpmSlider.value = bpm;
-                bpmDisplay.innerText = bpm;
-                bpmSlider.dispatchEvent(new Event('input'));
-
-                return convertSequenceSettings(seqSettings);
-            } else {
-                console.error("One of the sequences in the imported array doesn't match the expected format.");
-                return null;
-            }
-        }).filter(Boolean); // Filter out any invalid sequences
-
-        console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after processing all sequences
-
-    }
-
-    currentSequence = sequences.length; // Set the last sequence as the current sequence
-    channelSettings = sequences[currentSequence - 1];
-    updateUIForSequence(currentSequence);
+function isValidSequence(seq) {
+    return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
 }
 
-
-
-
-function convertSequenceSettings(settings) {
+function convertSequenceSettings(seqSettings) {
     let channels = settings.channels;
     if (channels.length < 16) {
         let emptyChannelsToAdd = 16 - channels.length;
@@ -176,4 +84,58 @@ function convertChannelToStepSettings(channel) {
 
     return stepSettings;
 }
+
+
+function updateBPM(bpm) {
+    let bpmSlider = document.getElementById('bpm-slider');
+    let bpmDisplay = document.getElementById('bpm-display');
+    bpmSlider.value = bpm;
+    bpmDisplay.innerText = bpm;
+    bpmSlider.dispatchEvent(new Event('input'));
+}
+
+// Refactored importSettings function
+
+function importSettings(settings) {
+    let parsedSettings;
+    let sequenceNames = [];
+
+    try {
+        parsedSettings = JSON.parse(settings);
+    } catch (error) {
+        console.error("Error parsing settings:", error);
+        return;
+    }
+
+    if (parsedSettings.urls && Array.isArray(parsedSettings.urls)) {
+        collectedURLs = collectedURLs.concat(parsedSettings.urls);
+    }
+
+    if (!Array.isArray(parsedSettings)) {
+        parsedSettings = [parsedSettings];
+    }
+
+    sequences = parsedSettings.map(seqSettings => {
+        if (isValidSequence(seqSettings)) {
+            sequenceNames.push(seqSettings.name);
+            sequenceBPMs.push(seqSettings.bpm || 0);
+            updateBPM(seqSettings.bpm);
+            return convertSequenceSettings(seqSettings);
+        } else {
+            console.error("One of the sequences in the imported array doesn't match the expected format.");
+            return null;
+        }
+    }).filter(Boolean);
+
+    console.log("Extracted sequence names:", sequenceNames);
+    console.log("Updated sequenceBPMs:", sequenceBPMs);
+
+    currentSequence = sequences.length;
+    channelSettings = sequences[currentSequence - 1];
+    updateUIForSequence(currentSequence);
+}
+
+
+
+
 

@@ -1,0 +1,47 @@
+/* --- Mode Switcher Styles --- */
+.mode-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 50px;
+}
+
+.mode-switcher label {
+    margin-right: 10px;
+}
+
+.mode-switcher input[type="checkbox"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.mode-switcher input[type="checkbox"]:checked {
+    background-color: #2196f3;
+}
+
+.mode-switcher input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.mode-switcher input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
+}
+
+#save-button, #load-button {
+  margin-left: 2px; /* Add some space between buttons */
+  right: 0px;
+}
+

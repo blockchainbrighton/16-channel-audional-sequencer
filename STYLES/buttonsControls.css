@@ -1,0 +1,33 @@
+/* --- Buttons & Controls --- */
+.button, h1 .button {
+    border: none;
+    background-color: var(--primary-color);
+    cursor: pointer;
+    box-shadow: var(--box-shadow-style);
+    padding: 10px;
+    color: var(--main-bg-color);
+    font-size: 1em;
+}
+
+.control-button {
+    width: var(--control-button-dimension);
+    height: var(--control-button-dimension);
+}
+
+.play-button, .stop-button {
+    position: relative;
+    width: var(--button-dimension);
+    height: var(--button-dimension);
+}
+
+#play.selected {
+    background-color: #00ff00;
+}
+
+.stop-button {
+    background-color: var(--accent-color);
+}
+
+.button-label.stop {
+    color: #ff0000;
+}

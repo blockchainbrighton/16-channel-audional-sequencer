@@ -1,0 +1,18 @@
+/* --- Channel Elements --- */
+.channel {
+    width: 92vw;
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ordinal-loaded {
+    border: 2px solid #f7931a;
+}
+
+/* Media query for screens smaller than 600px */
+@media (max-width: 600px) {
+    .channel {
+        width: 100%;
+    }
+}
