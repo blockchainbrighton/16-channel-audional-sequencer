@@ -167,3 +167,5 @@ const presets = {
     ]
   }
 };
+console.log("Initial Presets:", presets);
+

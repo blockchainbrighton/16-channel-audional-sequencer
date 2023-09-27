@@ -496,9 +496,11 @@ const loadPreset = (preset) => {
     }
 
     triggers.forEach(pos => {
-      const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
-      if (btn) btn.classList.add('selected');
+        const adjustedPos = pos + 1;  // Adjust the position for 1-based indexing
+        const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${adjustedPos})`);
+        if (btn) btn.classList.add('selected');
     });
+    
 
     toggleMuteSteps.forEach(pos => {
       const btn = document.querySelector(`.channel[data-id="Channel-${index + 1}"] .step-button:nth-child(${pos})`);
@@ -517,16 +519,23 @@ const loadPreset = (preset) => {
   });
   console.log(preset);
   // Load settings into the internal array
-  loadChannelSettingsFromPreset(presets[preset]);
 };
 
 // Load a preset when the page loads
 const presetToLoadOnPageLoad = 'preset1';
+
 if (presets[presetToLoadOnPageLoad]) {
-    loadPreset(presetToLoadOnPageLoad);
-    loadSequence(sequenceCount);  // Ensure the current sequence is loaded
+
+  // Convert preset data to JSON string
+  const presetSettings = JSON.stringify(presets[presetToLoadOnPageLoad]); 
+  
+  // Pass preset data to importSettings
+  importSettings(presetSettings);
+
+  loadSequence(sequenceCount);
+
 } else {
-    console.error('Preset not found:', presetToLoadOnPageLoad);
+  console.error('Preset not found:', presetToLoadOnPageLoad); 
 }
 
 

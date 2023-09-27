@@ -52,8 +52,9 @@ function loadChannelSettingsFromPreset(preset) {
 }
 
 function updateStep(channelIndex, stepIndex, state) {
-    channelSettings[channelIndex].steps[stepIndex + 1] = state;
+    channelSettings[channelIndex][stepIndex + 1] = state;
 }
+
 
 function getChannelSettings(channelIndex) {
     return channelSettings[channelIndex].steps;

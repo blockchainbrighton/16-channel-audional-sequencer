@@ -7,63 +7,65 @@ const EMPTY_CHANNEL = {
     "url": ""
 };
 
-let sequenceBPMs = Array(totalSequenceCount).fill(105);  // Initialize with 0 BPM for all sequences
+let sequenceBPMs = Array(totalSequenceCount).fill(105);
 
+function processChannel(sequenceData, channelIndex) {
+    console.log(`Processing channel at index: ${channelIndex}`);
+    const channelStepsData = sequenceData[channelIndex] || [];
+    const url = channels[channelIndex] && channels[channelIndex].dataset ? channels[channelIndex].dataset.originalUrl : "";
+    const stepTriggers = [];
+
+    channelStepsData.forEach((stepState, stepIndex) => {
+        if (stepState && stepIndex !== 0) {
+            stepTriggers.push(stepIndex);
+        }
+    });
+
+    const mute = channels[channelIndex] && channels[channelIndex].dataset ? channels[channelIndex].dataset.muted === 'true' : false;
+
+    console.log(`Processed channel data for index ${channelIndex}:`, {
+        triggers: stepTriggers,
+        mute: mute,
+        url: url
+    });
+
+    return {
+        triggers: stepTriggers,
+        mute: mute,
+        toggleMuteSteps: [],
+        url: url
+    };
+}
 
 function exportSettings() {
-    let allSequencesSettings = [];
-
-    for (let seqIndex = 0; seqIndex < sequences.length; seqIndex++) {
-        const sequence = sequences[seqIndex];
-        let hasTriggers = false;  // Assume sequence has no triggers until proven otherwise
-        let settings = {
-            channels: [],
+    console.log("Exporting settings...");
+    const allSequencesSettings = sequences.map((sequenceData, seqIndex) => {
+        const settings = {
+            name: `Sequence_${seqIndex + 1}`,
             bpm: sequenceBPMs[seqIndex],
-            name: `Sequence_${seqIndex + 1}`
+            channels: []
         };
 
         for (let i = 0; i < 16; i++) {
-            let channelSteps = sequence[i] || [];
-            let url = channels[i] && channels[i].dataset ? channels[i].dataset.originalUrl : "";
-
-            let triggers = [];
-            channelSteps.forEach((stepState, stepIndex) => {
-                if (stepState && stepIndex !== 0) {
-                    triggers.push(stepIndex);
-                }
-            });
-
-            let mute = channels[i] && channels[i].dataset ? channels[i].dataset.muted === 'true' : false;
-            if (triggers.length > 0) {
-                hasTriggers = true;  // The sequence has triggers if at least one channel has triggers
-            }
-            settings.channels.push({
-                triggers: triggers,
-                mute: mute,
-                toggleMuteSteps: [],
-                url: url
-            });
+            const channelData = processChannel(sequenceData, i);
+            settings.channels.push(channelData);
         }
 
-        if (!hasTriggers) {
-            break;  // Stop the export process if the current sequence doesn't have any triggers
-        }
+        return settings;
+    });
 
-        allSequencesSettings.push(settings);
-    }
-
-    let filename = `audiSeq_AllSequences.json`;
+    const filename = `audiSeq_AllSequences.json`;
+    console.log("Exported settings:", allSequencesSettings);
     return { settings: JSON.stringify(allSequencesSettings, null, 2), filename: filename };
 }
-
-// Helper Functions
 
 function isValidSequence(seq) {
     return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
 }
 
 function convertSequenceSettings(seqSettings) {
-    let channels = settings.channels;
+    console.log("Converting sequence settings...");
+    let channels = seqSettings.channels;
     if (channels.length < 16) {
         let emptyChannelsToAdd = 16 - channels.length;
         for (let i = 0; i < emptyChannelsToAdd; i++) {
@@ -74,9 +76,9 @@ function convertSequenceSettings(seqSettings) {
     return channels.map(ch => convertChannelToStepSettings(ch));
 }
 
-
 function convertChannelToStepSettings(channel) {
-    let stepSettings = [channel.url].concat(Array(64).fill(false)); // Store the URL at the 0th index
+    console.log("Converting channel to step settings...");
+    let stepSettings = [channel.url].concat(Array(64).fill(false));
 
     channel.triggers.forEach(i => {
         stepSettings[i] = true;
@@ -84,7 +86,6 @@ function convertChannelToStepSettings(channel) {
 
     return stepSettings;
 }
-
 
 function updateBPM(bpm) {
     let bpmSlider = document.getElementById('bpm-slider');
@@ -94,9 +95,8 @@ function updateBPM(bpm) {
     bpmSlider.dispatchEvent(new Event('input'));
 }
 
-// Refactored importSettings function
-
 function importSettings(settings) {
+    console.log("Importing settings...");
     let parsedSettings;
     let sequenceNames = [];
 
@@ -120,6 +120,8 @@ function importSettings(settings) {
             sequenceNames.push(seqSettings.name);
             sequenceBPMs.push(seqSettings.bpm || 0);
             updateBPM(seqSettings.bpm);
+            const convertedSettings = convertSequenceSettings(seqSettings);
+            console.log("Converted Settings:", convertedSettings);
             return convertSequenceSettings(seqSettings);
         } else {
             console.error("One of the sequences in the imported array doesn't match the expected format.");
@@ -127,6 +129,7 @@ function importSettings(settings) {
         }
     }).filter(Boolean);
 
+    console.log("Sequences after processing:", sequences);
     console.log("Extracted sequence names:", sequenceNames);
     console.log("Updated sequenceBPMs:", sequenceBPMs);
 
@@ -134,8 +137,3 @@ function importSettings(settings) {
     channelSettings = sequences[currentSequence - 1];
     updateUIForSequence(currentSequence);
 }
-
-
-
-
-
