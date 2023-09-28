@@ -1,7 +1,13 @@
 // embeddedPreset.js
 
+
+
+
+
 const presets = {
-    preset1: {
+  preset1: {
+    "name": "Preset 1",
+    "bpm": "105",
     "channels": [
       {
         "triggers": [
@@ -113,9 +119,58 @@ const presets = {
         "mute": false,
         "toggleMuteSteps": [],
         "url": "https://ordinals.com/content/6c01b1214fc4d4016d683380d066849e6bc645276b102604c098bd35fd77f791i0"
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
+      },
+      {
+        "triggers": [],
+        "mute": false,
+        "toggleMuteSteps": [],
+        "url": ""
       }
-            ],
-            "bpm": "105"
-          },
-  };
+    ]
+  }
+};
+console.log("Initial Presets:", presets);
+
 
