@@ -93,50 +93,20 @@
 </div>
 </div>
     
-<script>
-   const mainContainer = document.getElementById('app');
-const channelTemplateContainer = document.querySelector('.channel-template');
-const channelTemplate = channelTemplateContainer.querySelector('.channel');
-const quickPlayButtons = [];
 
-// Function to create the quick-play-button
-function createQuickPlayButton(index) {
-    const btn = document.createElement('div');
-    btn.classList.add('quick-play-button');
-    btn.dataset.sequenceIndex = index; // Store the sequence index as a data attribute
-    quickPlayButtons.push(btn); // Add the button to the array
-    return btn;
-}
-
-
-
-for (let i = 1; i <= 16; i++) {
-    let clonedChannel = channelTemplate.cloneNode(true);
-    clonedChannel.id = `channel-${i}`;
-
-    mainContainer.appendChild(clonedChannel);
-    console.log(`Created Channel Name: ${clonedChannel.id}, Index: ${i}`);
-}
-
-channelTemplateContainer.remove();
-
-
-
-</script>
-
-    <script src="sequenceChannelSettings.js"></script>
-
-    <script src="displayUpdatedValues.js"></script>
-    <script src="eventListeners.js"></script>
-    <script src="masterSettings.js"></script>
-    <script src="channelSettings.js"></script>
-    <script src="stepHandling.js"></script>
-    <script src="stepSchedulers.js"></script>
-    <script src="embeddedPreset.js"></script>
-    <script src="audionalSampleLibrary.js"></script>
-    <script src="audioUtils.js"></script>
-    <script src="importExport.js"></script>
-    <script src="index.js"></script>
+<script src="quickplayButtons.js"></script> <!-- Newly added external script link -->
+<script src="sequenceChannelSettings.js"></script>
+<script src="displayUpdatedValues.js"></script>
+<script src="eventListeners.js"></script>
+<script src="masterSettings.js"></script>
+<script src="channelSettings.js"></script>
+<script src="stepHandling.js"></script>
+<script src="stepSchedulers.js"></script>
+<script src="embeddedPreset.js"></script>
+<script src="audionalSampleLibrary.js"></script>
+<script src="audioUtils.js"></script>
+<script src="importExport.js"></script>
+<script src="index.js"></script>
 
 </body>
 
