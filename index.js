@@ -38,6 +38,7 @@ let clearConfirmTimeout = Array(channels.length).fill(null);
 
 let isContinuousPlay = false;
 
+
 const continuousPlayButton = document.getElementById('continuous-play');
 continuousPlayButton.addEventListener('click', () => {
     isContinuousPlay = !isContinuousPlay;  // Toggle the continuous play mode
@@ -76,11 +77,13 @@ continuousPlayButton.addEventListener('click', () => {
       gainNodes[index] = gainNode;
     
       // Logging to confirm gain node creation and attachment
-      console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
+      // console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
     
     
       const muteButton = channel.querySelector('.mute-button');
       muteButton.addEventListener('click', () => {
+        saveCurrentSequence(currentSequence);
+
           const isSoloed = soloedChannels[index];
           
           // If the channel is currently soloed, unsolo it before muting
@@ -126,6 +129,8 @@ continuousPlayButton.addEventListener('click', () => {
     const clearConfirm = channel.querySelector('.clear-confirm');
 
     clearButton.addEventListener('click', (e) => {
+        saveCurrentSequence(currentSequence);
+
         e.stopPropagation(); // Prevent the click from being captured by the document click listener
 
         if (!clearClickedOnce[index]) {
@@ -168,23 +173,21 @@ continuousPlayButton.addEventListener('click', () => {
     const stepsContainer = channel.querySelector('.steps-container');
     stepsContainer.innerHTML = '';
 
-    // Check if the current channel is 'channel-1'
-    let isChannelOne = channel.id === 'channel-1';
+
 
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < 64; i++) {
       const button = document.createElement('button');
       button.classList.add('step-button');
       
-      // Retrieve the channel index from the channel's id attribute
-      let channelIndex = parseInt(channel.id.split('-')[1]) - 1; // Convert 'channel-x' format to an index (0-15)
-      
       button.addEventListener('click', () => {
+        console.log ("step button clicked")
+        saveCurrentSequence(currentSequence);
         button.classList.toggle('selected');
         
         // Update the step's state in the channelSettings
         let stepState = button.classList.contains('selected');
-        updateStep(channelIndex, i, stepState);
+        updateStep(index, i, stepState);
       });
 
       fragment.appendChild(button);
@@ -195,6 +198,7 @@ continuousPlayButton.addEventListener('click', () => {
 
             const loadSampleButton = channel.querySelector('.load-sample-button');
                 loadSampleButton.addEventListener('click', () => {
+                    saveCurrentSequence(currentSequence);
                     // Create a basic modal for audional ID input
                     const idModal = document.createElement('div');
                     idModal.style.position = 'fixed';
@@ -368,8 +372,8 @@ continuousPlayButton.addEventListener('click', () => {
                     idModal.appendChild(idModalContent);
                     document.body.appendChild(idModal);
                 });
-                console.log("Collected URLs before adding to sequence arrays:", collectedURLs);
-                addURLsToSequenceArrays(collectedURLs);
+                // console.log("Collected URLs before adding to sequence arrays:", collectedURLs);
+                // addURLsToSequenceArrays(collectedURLs);
                 
 
         });

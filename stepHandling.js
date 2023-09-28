@@ -5,11 +5,11 @@ function handleStep(channel, channelData, totalStepCount) {
     const isToggleMuteStep = channelData.toggleMuteSteps.includes(totalStepCount);
 
     if (isToggleMuteStep) {
-      isMuted = !isMuted;
-      channel.dataset.muted = isMuted ? 'true' : 'false';
-      // Update the mute state in the DOM
-      updateMuteState(channel, isMuted);
-      console.log('Mute toggled by the handleStep function');
+        isMuted = !isMuted;
+        channel.dataset.muted = isMuted ? 'true' : 'false';
+        // Update the mute state in the DOM
+        updateMuteState(channel, isMuted);
+        console.log('Mute toggled by the handleStep function');
     }
 
     return isMuted;
@@ -29,8 +29,6 @@ function renderPlayhead(buttons, currentStep, isMuted) {
         }
     });
 }
-
-
 
 function playStep() {
     const presetData = presets.preset1;
@@ -89,6 +87,7 @@ function playStep() {
 
     nextStepTime += stepDuration;
     displayUpdatedValues();
+    console.log('Step played and updated');
 }
 
 function updateStepButtonsUI() {
@@ -103,4 +102,19 @@ function updateStepButtonsUI() {
             button.classList.remove('selected');
         }
     });
+    console.log('Step buttons UI updated');
+}
+
+
+function updateStep(channelIndex, stepIndex, state) {
+    if (!channelSettings[channelIndex]) {
+        console.error(`Channel settings not found for channel index: ${channelIndex}`);
+        return;
+    }
+    if (!Array.isArray(channelSettings[channelIndex])) {
+        console.error(`Steps for channel index ${channelIndex} is not an array.`, channelSettings[channelIndex]);
+        return;
+    }
+    channelSettings[channelIndex][stepIndex] = state;
+    console.log(`Updated step (${stepIndex}) for Channel ${channelIndex + 1} to ${state}`);
 }
