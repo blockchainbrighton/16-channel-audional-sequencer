@@ -158,11 +158,21 @@ function importSettings(settings) {
     }
         // Set current sequence to last imported
         currentSequence = sequences.length;
+        console.log("Number of sequences loaded:", sequences.length);  
+
+        // Activate the quick play button
+        setActiveSequence(currentSequence);
+        console.log("setActiveSequence to:", currentSequence);  
+
+
         channelSettings = sequences[currentSequence - 1];
         updateUIForSequence(currentSequence);
+
         console.log("Final sequences array:", sequences);
 
-
+        loadAndDisplaySequence(currentSequence);
+    
+        console.log("Import settings completed.");
        
 
 console.log("Import settings completed.");
