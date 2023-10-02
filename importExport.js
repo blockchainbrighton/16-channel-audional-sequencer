@@ -1,5 +1,8 @@
 // importExport.js
 
+let newJsonImport = false;
+
+
 const EMPTY_CHANNEL = {
     "url": "",
     "mute": false,
@@ -8,6 +11,7 @@ const EMPTY_CHANNEL = {
 
 let sequenceBPMs = Array(totalSequenceCount).fill(105);  // Initialize with 0 BPM for all sequences
 let collectedURLsForSequences = Array(sequences.length).fill().map(() => []);
+
 
 
 function exportSettings() {
@@ -61,8 +65,11 @@ function exportSettings() {
 
 
 function importSettings(settings) {
+    console.log("Importing settings...");
+
     let parsedSettings;
     let sequenceNames = [];
+    newJsonImport = true;
 
     try {
         parsedSettings = JSON.parse(settings);
@@ -148,16 +155,19 @@ function importSettings(settings) {
             }
         }).filter(Boolean);
 
-        console.log("Updated sequenceBPMs:", sequenceBPMs);
     }
+        // Set current sequence to last imported
+        currentSequence = sequences.length;
+        channelSettings = sequences[currentSequence - 1];
+        updateUIForSequence(currentSequence);
+        console.log("Final sequences array:", sequences);
 
-    currentSequence = sequences.length;
-    channelSettings = sequences[currentSequence - 1];
-    updateUIForSequence(currentSequence);
-    console.log("Final sequences array:", sequences);
+
+       
+
+console.log("Import settings completed.");
+
 }
-
-
 
 
 function convertSequenceSettings(settings) {
@@ -185,4 +195,5 @@ function convertChannelToStepSettings(channel) {
 
     return stepSettings;
 }
+
 
