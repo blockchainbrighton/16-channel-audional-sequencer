@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", function() {
       reader.onload = function(e) {
           let settings = e.target.result;
           importSettings(settings);
+          console.log("Loaded file content:", settings);
+
       };
       reader.readAsText(file);
   });

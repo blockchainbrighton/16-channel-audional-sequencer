@@ -64,79 +64,127 @@ continuousPlayButton.addEventListener('click', () => {
           gainNodes[index].gain.value = volumeStates[index];
       }
     }
+    // Function to update the dim state based on gain value
+    function updateDimState(channel, index) {
+        const stepButtons = channel.querySelectorAll('.step-button');
+        if (gainNodes[index].gain.value === 0) {
+            stepButtons.forEach(button => button.classList.add('dimmed'));
+        } else {
+            stepButtons.forEach(button => button.classList.remove('dimmed'));
+        }
+    }
     
 
-    channels.forEach((channel, index) => {
-      channel.dataset.id = `Channel-${index + 1}`;
-      
-      // Create a gain node for the channel
-      const gainNode = audioContext.createGain();
-      gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
-      gainNode.connect(audioContext.destination);
-      gainNodes[index] = gainNode;
+// Global document click listener for clear buttons
+document.addEventListener('click', () => {
+    channels.forEach((channel, channelIndex) => {
+        if (clearClickedOnce[channelIndex]) {
+            const clearConfirm = channel.querySelector('.clear-confirm');
+            clearConfirm.style.display = "none";
+            clearTimeout(clearConfirmTimeout[channelIndex]);
+            clearClickedOnce[channelIndex] = false;
+        }
+    });
+});
+
+channels.forEach((channel, index) => {
+    channel.dataset.id = `Channel-${index + 1}`;
+    
+    // Create a gain node for the channel
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 1; // Initial volume set to 1 (full volume)
+    gainNode.connect(audioContext.destination);
+    gainNodes[index] = gainNode;
     
       // Logging to confirm gain node creation and attachment
       console.log(`Gain node created for Channel-${index + 1}. Current gain value: ${gainNode.gain.value}`);
     
-    
-      const muteButton = channel.querySelector('.mute-button');
-      muteButton.addEventListener('click', () => {
-          const isSoloed = soloedChannels[index];
-          
-          // If the channel is currently soloed, unsolo it before muting
-          if (isSoloed) {
-              soloedChannels[index] = false;
-              soloButton.classList.remove('selected');
-          }
-    
-          // Update mute state after addressing solo state
-          const currentMuteState = channel.dataset.muted === 'true';
-          updateMuteState(channel, !currentMuteState);
-          console.log(`Channel-${index + 1} channels.forEach just toggled updateMuteState`);
-      });
-    
-    
-    
       
-      const soloButton = channel.querySelector('.solo-button');
-      soloButton.addEventListener('click', () => {
-          const isSoloed = soloedChannels[index];
+      const muteButton = channel.querySelector('.mute-button');
+        muteButton.addEventListener('click', () => {
+            if (muteButton.classList.contains('selected')) {
+                muteButton.classList.remove('selected');
+                
+                // Check if any channel is soloed
+                if (!soloedChannels.some(state => state) || soloedChannels[index]) {
+                    gainNodes[index].gain.value = 1;
+                }
+            } else {
+                muteButton.classList.add('selected');
+                gainNodes[index].gain.value = 0;
 
-          // Toggle solo state for the current channel
-          soloedChannels[index] = !isSoloed;
-          soloButton.classList.toggle('selected', !isSoloed);
+                // If the current channel is soloed and being muted, remove its solo status
+                if (soloedChannels[index]) {
+                    soloedChannels[index] = false;
+                    const soloButton = channel.querySelector('.solo-button');
+                    soloButton.classList.remove('selected');
+                }
+            }
+            updateDimState(channel, index);
+        });
 
-          // Reset all channels to unmuted state
-          channels.forEach((otherChannel, otherIndex) => {
-              updateMuteState(otherChannel, false);
-          });
+      
 
-          // If there are any channels in solo mode, mute all channels that are not soloed
-          if (soloedChannels.some(state => state)) {
-              channels.forEach((otherChannel, otherIndex) => {
-                  if (!soloedChannels[otherIndex]) {
-                      updateMuteState(otherChannel, true);
-                  }
-              });
-          }
-      });
+        const soloButton = channel.querySelector('.solo-button');
+        soloButton.addEventListener('click', () => {
+            // Toggle solo state for the current channel
+            soloedChannels[index] = !soloedChannels[index];
+            soloButton.classList.toggle('selected', soloedChannels[index]);
+
+            // If this channel is now soloed
+            if (soloedChannels[index]) {
+                gainNodes[index].gain.value = 1; // Ensure its gain is set to 1
+                muteButton.classList.remove('selected'); // Ensure it's not muted
+                updateDimState(channel, index);
+
+                // Mute and dim all other non-soloed channels
+                channels.forEach((otherChannel, otherIndex) => {
+                    if (!soloedChannels[otherIndex] && otherIndex !== index) {
+                        gainNodes[otherIndex].gain.value = 0;
+                        updateDimState(otherChannel, otherIndex);
+                    }
+                });
+            } else {
+                // If this channel is now unsoloed and no other channels are soloed
+                if (!soloedChannels.some(state => state)) {
+                    channels.forEach((otherChannel, otherIndex) => {
+                        gainNodes[otherIndex].gain.value = otherChannel.querySelector('.mute-button').classList.contains('selected') ? 0 : 1;
+                        updateDimState(otherChannel, otherIndex);
+                    });
+                } else {
+                    // If other channels are still soloed, mute the current channel regardless of its mute button state
+                    gainNodes[index].gain.value = 0;
+                    updateDimState(channel, index);
+                }
+            }
+        });
+
+
+
 
     
     const clearButton = channel.querySelector('.clear-button');
     const clearConfirm = channel.querySelector('.clear-confirm');
 
     clearButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent the click from being captured by the document click listener
-
+        e.stopPropagation();
+    
         if (!clearClickedOnce[index]) {
-            // Show the visual indication
-            clearConfirm.style.display = "block";
-            clearClickedOnce[index] = true;
+            // Start the flashing effect
+            clearButton.classList.add('flashing');
+            clearButton.classList.remove('dimmed');
 
+    
+            // Show the visual indication
+            clearClickedOnce[index] = true;
+    
             // Set a timer to hide the confirmation after 2 seconds
             clearConfirmTimeout[index] = setTimeout(() => {
                 clearConfirm.style.display = "none";
-                clearClickedOnce[index] = false;  // Reset the variable for the specific channel when the timer ends
+                clearClickedOnce[index] = false;
+                // Stop the flashing effect
+                clearButton.classList.remove('flashing');  // <-- This line was corrected
+                clearButton.classList.add('dimmed');
             }, 2000);
         } else {
             // Clear the steps
@@ -144,20 +192,26 @@ continuousPlayButton.addEventListener('click', () => {
             stepButtons.forEach(button => {
                 button.classList.remove('selected');
             });
-            
+    
             // Hide the visual indication
             clearConfirm.style.display = "none";
-            clearTimeout(clearConfirmTimeout[index]); // Clear the timer for the specific channel
-            clearClickedOnce[index] = false;  // Reset the variable for the specific channel after clearing steps
+            clearTimeout(clearConfirmTimeout[index]);
+            clearClickedOnce[index] = false;
+            // Stop the flashing effect
+            clearButton.classList.remove('flashing');  // <-- This line was corrected
+            clearButton.classList.add('dimmed');
+
         }
     });
+    
 
     // Handle clicks outside the clear button
-    document.addEventListener('click', () => {
-        if (clearClickedOnce[index]) {
+    document.addEventListener('click', (e) => {
+        if (!clearButton.contains(e.target) && clearClickedOnce[index]) {
             clearConfirm.style.display = "none";
             clearTimeout(clearConfirmTimeout[index]); // Clear the timer for the specific channel
             clearClickedOnce[index] = false;  // Reset the variable for the specific channel when clicked outside
+            clearButton.classList.remove('flashing');
         }
     });
 
