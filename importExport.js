@@ -1,13 +1,13 @@
 // importExport.js
 
 const EMPTY_CHANNEL = {
-    "triggers": [],
+    "url": "",
     "mute": false,
-    "toggleMuteSteps": [],
-    "url": ""
+    "triggers": []
 };
 
 let sequenceBPMs = Array(totalSequenceCount).fill(105);  // Initialize with 0 BPM for all sequences
+let collectedURLsForSequences = Array(sequences.length).fill().map(() => []);
 
 
 function exportSettings() {
@@ -17,14 +17,16 @@ function exportSettings() {
         const sequence = sequences[seqIndex];
         let hasTriggers = false;  // Assume sequence has no triggers until proven otherwise
         let settings = {
-            channels: [],
+            name: `Sequence_${seqIndex + 1}`,
             bpm: sequenceBPMs[seqIndex],
-            name: `Sequence_${seqIndex + 1}`
+            channels: [],
         };
 
         for (let i = 0; i < 16; i++) {
             let channelSteps = sequence[i] || [];
-            let url = channels[i] && channels[i].dataset ? channels[i].dataset.originalUrl : "";
+            
+            // Fetch URL from collectedURLsForSequences or set as an empty string
+            let url = collectedURLsForSequences[seqIndex][i] || "";
 
             let triggers = [];
             channelSteps.forEach((stepState, stepIndex) => {
@@ -38,10 +40,9 @@ function exportSettings() {
                 hasTriggers = true;  // The sequence has triggers if at least one channel has triggers
             }
             settings.channels.push({
-                triggers: triggers,
+                url: url,
                 mute: mute,
-                toggleMuteSteps: [],
-                url: url
+                triggers: triggers
             });
         }
 
@@ -58,50 +59,57 @@ function exportSettings() {
 
 
 
+
 function importSettings(settings) {
     let parsedSettings;
-    let sequenceNames = []; // Initialize an empty array to store sequence names
-
+    let sequenceNames = [];
 
     try {
         parsedSettings = JSON.parse(settings);
+        console.log("Parsed settings:", parsedSettings);
     } catch (error) {
         console.error("Error parsing settings:", error);
         return;
     }
 
-    if (parsedSettings.urls && Array.isArray(parsedSettings.urls)) {
-        // Assuming collectedURLs is an array, you can concatenate it with new URLs
-        collectedURLs = collectedURLs.concat(parsedSettings.urls);
+    if (parsedSettings && Array.isArray(parsedSettings)) {
+        collectedURLsForSequences = parsedSettings.map(seq => {
+            let urlsForSequence = seq.channels.map(ch => ch.url || "");
+            console.log("URLs for this sequence:", urlsForSequence);
+            while (urlsForSequence.length < 16) {
+                urlsForSequence.push("");
+            }
+            return urlsForSequence;
+        });
+        console.log("Final collectedURLsForSequences:", collectedURLsForSequences);
     }
 
-    // Utility function to check if the structure is valid
     function isValidSequence(seq) {
-        return seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
+        const isValid = seq && Array.isArray(seq.channels) && typeof seq.name === 'string';
+        console.log(`Sequence ${seq.name} is valid: ${isValid}`);
+        return isValid;
     }
 
     sequences = parsedSettings.map(seqSettings => {
         if (isValidSequence(seqSettings)) {
-            sequenceNames.push(seqSettings.name); // Extract the name and store it in the sequenceNames array
-            // ... (rest of the code remains unchanged)
+            sequenceNames.push(seqSettings.name);
         } else {
             console.error("One of the sequences in the imported array doesn't match the expected format.");
             return null;
         }
-    }).filter(Boolean); // Filter out any invalid sequences
+        return convertSequenceSettings(seqSettings);
+    }).filter(Boolean);
 
-    console.log("Extracted sequence names:", sequenceNames); // Log the extracted sequence names
+    console.log("Extracted sequence names:", sequenceNames);
 
-
-    sequenceBPMs = [];  // Clear the sequenceBPMs array before filling it with new BPM values
-    console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after clearing the array
+    sequenceBPMs = [];
+    console.log("Updated sequenceBPMs:", sequenceBPMs);
 
     if (!Array.isArray(parsedSettings) && sequences.length > 0) {
         if (isValidSequence(parsedSettings)) {
             sequences.push(convertSequenceSettings(parsedSettings));
-            sequenceBPMs.push(parsedSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
+            sequenceBPMs.push(parsedSettings.bpm || 0);
 
-            // Update the BPM slider and display with the imported value
             let bpm = parsedSettings.bpm;
             let bpmSlider = document.getElementById('bpm-slider');
             let bpmDisplay = document.getElementById('bpm-display');
@@ -113,7 +121,6 @@ function importSettings(settings) {
             return;
         }
     } else {
-        // Ensure that if it's a single sequence, it's converted into an array format
         if (!Array.isArray(parsedSettings)) {
             if (isValidSequence(parsedSettings)) {
                 parsedSettings = [parsedSettings];
@@ -125,9 +132,8 @@ function importSettings(settings) {
 
         sequences = parsedSettings.map(seqSettings => {
             if (isValidSequence(seqSettings)) {
-                sequenceBPMs.push(seqSettings.bpm || 0);  // Add the BPM to the sequenceBPMs array
+                sequenceBPMs.push(seqSettings.bpm || 0);
 
-                // Update the BPM slider and display with the imported value for each sequence
                 let bpm = seqSettings.bpm;
                 let bpmSlider = document.getElementById('bpm-slider');
                 let bpmDisplay = document.getElementById('bpm-display');
@@ -140,15 +146,15 @@ function importSettings(settings) {
                 console.error("One of the sequences in the imported array doesn't match the expected format.");
                 return null;
             }
-        }).filter(Boolean); // Filter out any invalid sequences
+        }).filter(Boolean);
 
-        console.log("Updated sequenceBPMs:", sequenceBPMs);  // Log after processing all sequences
-
+        console.log("Updated sequenceBPMs:", sequenceBPMs);
     }
 
-    currentSequence = sequences.length; // Set the last sequence as the current sequence
+    currentSequence = sequences.length;
     channelSettings = sequences[currentSequence - 1];
     updateUIForSequence(currentSequence);
+    console.log("Final sequences array:", sequences);
 }
 
 
@@ -163,9 +169,12 @@ function convertSequenceSettings(settings) {
         }
     }
 
-    return channels.map(ch => convertChannelToStepSettings(ch));
+    return channels.map(ch => {
+        let convertedChannel = convertChannelToStepSettings(ch);
+        console.log("Converted channel:", convertedChannel);
+        return convertedChannel;
+    });
 }
-
 
 function convertChannelToStepSettings(channel) {
     let stepSettings = [channel.url].concat(Array(64).fill(false)); // Store the URL at the 0th index

@@ -45,13 +45,14 @@ body {
 
 /* --- Drum Machine Container --- */
 #drum-machine {
-    width: 95%; /* Updated width to ensure 95% of the page */
+    max-width: 100%; /* Set a maximum width to fit within the available space */
     margin: 0 auto;
     padding: 0;
     background-color: var(--secondary-bg-color);
     border: 5px solid var(--main-bg-color);
     box-sizing: border-box; /* Include padding and border in the total width */
 }
+
 
 /* --- Headers & Text Elements --- */
 h1 {
@@ -107,6 +108,18 @@ h3:hover .subtext {
 .control-button {
     width: var(--control-button-dimension);
     height: var(--control-button-dimension);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold; /* Making the letters bold */
+    padding: 0; /* Resetting padding */
+    margin: 0; /* Resetting margin */
+    position: relative; /* Making it a stacking context for tooltip */
+}
+
+.letter {
+    z-index: 1; /* Ensuring it stays above the tooltip */
+    font-size: 16px; /* Adjust the font size as necessary */
 }
 
 .play-button, .stop-button {
@@ -199,7 +212,7 @@ div[idModalContent] div a:hover {
 }
 
 .button-container, .subtext-container {
-    display: flex;
+    display: center;
     align-items: center;
 }
 
@@ -256,7 +269,7 @@ div[idModalContent] div a:hover {
 }
 
 .clear-button {
-    background-color: #ff0;
+    background-color: rgb(153, 153, 2);
 }
 
 .mute-button {
@@ -264,12 +277,28 @@ div[idModalContent] div a:hover {
 }
 
 .solo-button {
-    background-color: rgb(253, 204, 114);
+    background-color: rgb(177, 105, 33);
 }
 
 .solo-button.selected {
-    background-color: darkorange;
+    background-color: rgb(255, 128, 0);
 }
+
+@keyframes flashingYellow {
+    0% { background-color: rgb(153, 153, 2); }
+    50% { background-color: rgb(255, 255, 0); } /* Bright yellow */
+    100% { background-color: rgb(153, 153, 2); }
+}
+
+.clear-button.flashing {
+    animation: flashingYellow 0.5s infinite; /* Will make it blink twice per second */
+}
+
+.step-button.dimmed {
+    opacity: 0.5; /* You can adjust this value as needed */
+}
+
+
 
 .load-sample-button {
     flex: 1;
@@ -314,6 +343,7 @@ div[idModalContent] div a:hover {
 }
 
 /* --- Tooltip Styles --- */
+/* --- Tooltip Styles --- */
 .tooltip {
     position: relative;
     display: inline-block;
@@ -321,6 +351,7 @@ div[idModalContent] div a:hover {
 }
 
 .tooltip .tooltiptext {
+    display: none;
     visibility: hidden;
     max-width: 150px; /* Reduce the width */
     background-color: #333;
@@ -330,18 +361,21 @@ div[idModalContent] div a:hover {
     padding: 5px; /* Reduce the padding */
     position: absolute;
     z-index: 1;
-    bottom: -15%; /* Adjust the position */
+    bottom: calc(100% + 5px); /* Adjust the position to be just below the button */
     left: 50%;
     transform: translateX(-50%);
-    opacity: 0;
+    opacity: 0.7; /* Reduced opacity to make it semi-transparent */
     transition: opacity 0.3s;
     font-size: 12px; /* Reduce the font size */
+    pointer-events: none; /* Prevent the tooltip from intercepting clicks */
 }
 
 .tooltip:hover .tooltiptext {
     visibility: visible;
-    opacity: 0;
+    opacity: 0.7; /* Maintain the reduced opacity even on hover */
 }
+
+
 
 /* --- Animations --- */
 @keyframes flash {
